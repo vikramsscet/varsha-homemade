@@ -38,6 +38,19 @@ export const products = [
     badge: 'Classic',
     description: 'Slow-roasted gram flour, ghee, and a whisper of cardamom.',
     href: 'https://www.varsha-homemade.com/product-page/besan-ladoo',
+    longDescription: `Traditional Besan Ladoo (500g)
+
+✨ Rich, melt-in-the-mouth Besan Ladoos made with pure desi ghee and premium gram flour.
+
+✅ Homemade
+
+✅ No Preservatives
+
+✅ Premium Dry Fruits
+
+✅ Freshly Prepared
+
+📦 Pack Size: 500g`
   },
   {
     title: 'Ragi Ladoo',
@@ -45,6 +58,17 @@ export const products = [
     badge: 'Celebration',
     description: 'Delicate pearls of joy, made for the most special moments.',
     href: 'https://www.varsha-homemade.com/product-page/ragi-ladoo',
+    longDescription:`Healthy Ragi Ladoo (250g)
+
+Nutritious finger millet ladoos packed with natural goodness and pure ghee.
+
+💚 Rich in Calcium
+
+💚 High Fiber
+
+💚 No Artificial Ingredients
+
+📦 Pack Size: 250g`
   },
   {
     title: 'Dry Fruit Ladoo',
@@ -52,6 +76,17 @@ export const products = [
     badge: 'Wholesome',
     description: 'Nutty, naturally sweet, and packed with premium dry fruits.',
     href: 'https://www.varsha-homemade.com/product-page/premium-dry-fruit-ladoo',
+    longDescription:`Dry Fruit Ladoo (500g)
+
+A luxurious blend of almonds, cashews, pistachios, dates, raisins & seeds.
+
+⭐ Premium Ingredients
+
+⭐ No Added Sugar
+
+⭐ Energy Booster
+
+📦 Pack Size: 500g`
   },
   {
     title: 'Coconut Ladoo',
@@ -59,6 +94,17 @@ export const products = [
     badge: 'House favourite',
     description: 'Rich, melt-in-your-mouth squares with a touch of gold.',
     href: 'https://www.varsha-homemade.com/product-page/coconut-ladoo',
+    longDescription:`Fresh Coconut Ladoo (500g)
+
+Soft, delicious coconut ladoos made from freshly grated coconut and premium ingredients.
+
+❤️ Freshly Homemade
+
+❤️ Rich Coconut Flavor
+
+❤️ Festival Favourite
+
+📦 Pack Size: 500g`
   },
 ];
 
