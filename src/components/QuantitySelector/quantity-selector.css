@@ -1,0 +1,3 @@
+.quantity-selector{display:inline-flex;align-items:center;border:1px solid #ddd;padding:6px 8px;border-radius:2px;gap:12px;margin:8px 0}
+.quantity-selector .qty-btn{background:#fff;border:1px solid #ddd;padding:6px 10px;font-size:18px;cursor:pointer}
+.quantity-selector .qty-value{min-width:36px;text-align:center}

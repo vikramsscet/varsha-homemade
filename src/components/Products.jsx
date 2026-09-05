@@ -14,17 +14,19 @@ export default function Products({ products }) {
 
         <div className="products">
           {products.map((product) => (
-            <article className="product-card reveal" key={product.title}>
-              <div className="product-image">
-                <img src={product.image} loading="lazy" alt={product.title} />
-                <span>{product.badge}</span>
-              </div>
-              <h3>{product.title}</h3>
-              <p>{product.description}</p>
-              <a href={product.href} target="_blank" rel="noreferrer">
-                Order now <span>→</span>
-              </a>
-            </article>
+            <Link to={`/products/${product.id}`} aria-label={`View ${product.title}`}>
+              <article className="product-card reveal" key={product.title}>
+                <div className="product-image">
+                  <img src={product.image} loading="lazy" alt={product.title} />
+                  <span>{product.badge}</span>
+                </div>
+                <h3>{product.title}</h3>
+                <p>{product.description}</p>
+                <a href={product.href} target="_blank" rel="noreferrer">
+                  Order now <span>→</span>
+                </a>
+              </article>
+            </Link>
           ))}
         </div>
 

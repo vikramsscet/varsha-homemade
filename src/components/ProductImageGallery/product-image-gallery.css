@@ -1,0 +1,6 @@
+.product-image-gallery{display:flex;gap:16px}
+.product-image-gallery .thumbnails{display:flex;flex-direction:column;gap:8px}
+.product-image-gallery .thumb{width:56px;height:56px;background-size:cover;background-position:center;border:1px solid #eee}
+.product-image-gallery .thumb.active{outline:3px solid #7d2028}
+.product-image-gallery .gallery-main img{max-width:560px;width:100%;height:auto;display:block}
+@media(max-width:800px){.product-image-gallery{flex-direction:row}.product-image-gallery .thumbnails{flex-direction:row}.product-image-gallery .thumb{width:48px;height:48px}}

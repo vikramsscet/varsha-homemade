@@ -33,6 +33,7 @@ export const trustItems = [
 
 export const products = [
   {
+    id: 12,
     title: 'Besan Ladoo',
     image: besanLadoo,
     badge: 'Classic',
@@ -53,6 +54,7 @@ export const products = [
 📦 Pack Size: 500g`
   },
   {
+    id: 11,
     title: 'Ragi Ladoo',
     image: ragiLadoo,
     badge: 'Celebration',
@@ -71,6 +73,7 @@ Nutritious finger millet ladoos packed with natural goodness and pure ghee.
 📦 Pack Size: 250g`
   },
   {
+    id: 10,
     title: 'Dry Fruit Ladoo',
     image: dryFruitLadoo,
     badge: 'Wholesome',
@@ -89,6 +92,7 @@ A luxurious blend of almonds, cashews, pistachios, dates, raisins & seeds.
 📦 Pack Size: 500g`
   },
   {
+    id: 9,
     title: 'Coconut Ladoo',
     image: coconutLadoo,
     badge: 'House favourite',
