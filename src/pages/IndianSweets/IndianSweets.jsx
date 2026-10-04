@@ -1,6 +1,5 @@
 import CategoryHeader from '../../components/CategoryHeader/CategoryHeader';
 import ProductGrid from '../../components/ProductGrid/ProductGrid';
-import { products } from '../../data/products';
 
 export default function IndianSweetsPage() {
   return (
@@ -44,7 +43,7 @@ export default function IndianSweetsPage() {
                 <button type="button">Recommended</button>
               </div>
             </div>
-            <ProductGrid products={products} />
+            <ProductGrid />
           </section>
         </div>
       </div>
