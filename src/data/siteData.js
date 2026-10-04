@@ -4,14 +4,6 @@ import dryFruitLadoo from '../../assets/Dryfruit.png';
 import coconutLadoo from '../../assets/Coconut.jpg';
 import premiumSweets from '../../assets/varsha-sweets-premium.png';
 import logo from '../../assets/header-logo.png';
-import galleryOne from '../../assets/varsha-sweets-premium.png';
-import galleryTwo from '../../assets/RagiLadoo.png';
-import galleryThree from '../../assets/Coconut.jpg';
-import galleryFour from '../../assets/Dryfruit.png';
-import galleryFive from '../../assets/BesanLadoo.jpg';
-import gallerySix from '../../assets/Coconut.jpg';
-import gallerySeven from '../../assets/varsha-sweets-premium.png';
-import galleryEight from '../../assets/RagiLadoo.png';
 
 export const heroImage = premiumSweets;
 export const logoImage = logo;
@@ -29,17 +21,6 @@ export const trustItems = [
   'Traditional family recipes',
   'Made fresh for you',
   'Beautifully gift-ready',
-];
-
-export const galleryItems = [
-  { src: galleryOne, alt: 'Festive Indian sweets', caption: 'Freshly made', full: galleryOne, tall: true },
-  { src: galleryTwo, alt: 'Ladoo arrangement', caption: 'Little golden joys', full: galleryTwo },
-  { src: galleryThree, alt: 'Traditional barfi', caption: 'Tradition on a plate', full: galleryThree },
-  { src: galleryFour, alt: 'Dry fruit sweets', caption: 'Premium ingredients', full: galleryFour, wide: true },
-  { src: galleryFive, alt: 'Festive Indian sweets', caption: 'Freshly made', full: galleryFive, wide: true },
-  { src: gallerySix, alt: 'Coconut ladoo', caption: 'House favourite', full: gallerySix, tall: true },
-  { src: gallerySeven, alt: 'Dry fruit ladoo', caption: 'Wholesome', full: gallerySeven },
-  { src: galleryEight, alt: 'Ragi ladoo', caption: 'Celebration', full: galleryEight },
 ];
 
 export const faqItems = [
