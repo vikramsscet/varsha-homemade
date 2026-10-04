@@ -8,7 +8,7 @@ import Gallery from '../../components/Gallery';
 import Reviews from '../../components/Reviews';
 import Faq from '../../components/Faq';
 import Contact from '../../components/Contact';
-import { heroImage, products, galleryItems, faqItems, reviews, trustItems } from '../../data/siteData';
+import { heroImage, galleryItems, faqItems, reviews, trustItems } from '../../data/siteData';
 
 export default function HomePage() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -18,7 +18,7 @@ export default function HomePage() {
       <Hero heroImage={heroImage} />
       <TrustBar items={trustItems} />
       <About />
-      <Products products={products} />
+      <Products />
       <Festivals festivalImage={heroImage} />
       <Gallery galleryItems={galleryItems} onOpenLightbox={(src, alt) => setSelectedImage({ src, alt })} />
       <Reviews reviews={reviews} />
