@@ -1,0 +1,9 @@
+.login-page { display: flex; justify-content: center; padding: 140px 0 80px; }
+.login-card { width: 100%; max-width: 420px; padding: 36px 28px; text-align: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; }
+.login-card h1 { margin: 0 0 8px; font: 600 30px/1.2 var(--serif); color: var(--maroon); }
+.login-card p { margin: 0 0 20px; color: var(--muted); }
+.google-signin { display: flex; justify-content: center; min-height: 44px; }
+.google-signin.is-disabled { opacity: .5; pointer-events: none; }
+.login-card .login-status { margin: 16px 0 0; }
+.login-card .login-error { margin: 16px 0 0; color: var(--maroon); font-weight: 600; }
+.auth-link { background: none; border: 0; cursor: pointer; font: inherit; color: inherit; }

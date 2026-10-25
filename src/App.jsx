@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import HomePage from './pages/Home/Home';
 import IndianSweetsPage from './pages/IndianSweets/IndianSweets';
 import ProductDetailPage from './pages/ProductDetail/ProductDetail';
+import LoginPage from './pages/Login/Login';
 import { navLinks, logoImage } from './data/siteData';
 
 function ScrollToTop() {
@@ -58,6 +59,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/category/indian-sweets" element={<IndianSweetsPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
       <Footer logo={logoImage} />
 

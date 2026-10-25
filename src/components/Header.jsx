@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onCloseMenu }) {
   const location = useLocation();
+  const { isAuthenticated, signOut } = useAuth();
 
   const handleBrandClick = () => {
     onCloseMenu();
@@ -29,6 +31,11 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
           {navLinks.map((link) => (
             <a key={link.href} href={link.href} onClick={onCloseMenu}>{link.label}</a>
           ))}
+          {isAuthenticated ? (
+            <button type="button" className="auth-link" onClick={() => { signOut(); onCloseMenu(); }}>Sign out</button>
+          ) : (
+            <Link to="/login" onClick={onCloseMenu}>Sign in</Link>
+          )}
         </div>
       </nav>
     </header>
