@@ -262,10 +262,13 @@ describe('breadcrumbs', () => {
   const navs = (r) => hosts(r, (p) => p['aria-label'] === 'Breadcrumb');
   const crumbText = (r) => text(navs(r)[0]);
 
-  it('shows Home / product name (never the UUID) once the product loads', async () => {
+  it('shows Home / Indian Sweets / product name (never the UUID) once the product loads', async () => {
     const r = await render();
     expect(navs(r)).toHaveLength(1);
-    expect(crumbText(r)).toBe('Home/Kaju Katli');
+    expect(crumbText(r)).toBe('Home/Indian Sweets/Kaju Katli');
+    const category = hosts(r, (p) => p.href === '/category/indian-sweets');
+    expect(category).toHaveLength(1);
+    expect(text(category[0])).toBe('Indian Sweets');
     expect(crumbText(r)).not.toContain(ID);
     const current = hosts(r, (p) => p['aria-current'] === 'page')[0];
     expect(current.type).toBe('span');
@@ -275,7 +278,7 @@ describe('breadcrumbs', () => {
 
   it('falls back to the slug when the product has no title', async () => {
     const r = await render({ ...product, title: undefined, slug: 'kaju-katli' });
-    expect(crumbText(r)).toBe('Home/kaju-katli');
+    expect(crumbText(r)).toBe('Home/Indian Sweets/kaju-katli');
   });
 
   it('shows a placeholder, not the UUID, while the product is loading', async () => {
@@ -304,7 +307,8 @@ describe('breadcrumbs', () => {
       );
     });
     expect(navs(r)).toHaveLength(1);
-    expect(crumbText(r)).toBe('Home/Product');
+    expect(crumbText(r)).toBe('Home/Indian Sweets/Product');
+    expect(hosts(r, (p) => p.href === '/category/indian-sweets')).toHaveLength(1);
     expect(crumbText(r)).not.toContain(ID);
   });
 });

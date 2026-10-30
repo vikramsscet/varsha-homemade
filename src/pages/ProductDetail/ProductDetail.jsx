@@ -107,11 +107,12 @@ export default function ProductDetailPage() {
   // Never the raw UUID in the trail: the product's name (or slug) once known, a placeholder
   // while loading, and a generic label when the product can't be shown.
   const homeCrumb = { label: 'Home', to: '/' };
+  const categoryCrumb = { label: 'Indian Sweets', to: '/category/indian-sweets' };
 
   if (isLoading) {
     return (
       <main className="container product-fallback">
-        <Breadcrumbs items={[homeCrumb, { label: '…' }]} />
+        <Breadcrumbs items={[homeCrumb, categoryCrumb, { label: '…' }]} />
         <p role="status">Loading product...</p>
       </main>
     );
@@ -120,7 +121,7 @@ export default function ProductDetailPage() {
   if (error) {
     return (
       <main className="container product-fallback">
-        <Breadcrumbs items={[homeCrumb, { label: 'Product' }]} />
+        <Breadcrumbs items={[homeCrumb, categoryCrumb, { label: 'Product' }]} />
         <p role="alert">Unable to load this product. Please try again later.</p>
         <button onClick={() => navigate(-1)}>Go back</button>
       </main>
@@ -130,7 +131,7 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <main className="container product-fallback">
-        <Breadcrumbs items={[homeCrumb, { label: 'Product' }]} />
+        <Breadcrumbs items={[homeCrumb, categoryCrumb, { label: 'Product' }]} />
         <h2>Product Not Found</h2>
         <p>The product you are looking for does not exist.</p>
         <button onClick={() => navigate(-1)}>Go back</button>
@@ -174,7 +175,7 @@ export default function ProductDetailPage() {
     <main className="product-detail-shell">
       {/* Same wrapper as other pages so the trail aligns with the Cart/Profile/Category crumbs. */}
       <div className="container">
-        <Breadcrumbs items={[homeCrumb, { label: product.title || product.slug }]} />
+        <Breadcrumbs items={[homeCrumb, categoryCrumb, { label: product.title || product.slug }]} />
       </div>
       <div className="container product-detail-grid">
         <aside className="thumb-col" aria-hidden>
