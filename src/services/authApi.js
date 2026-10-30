@@ -1,4 +1,4 @@
-import { ApiError, request } from './apiClient';
+import { ApiError, request, resolveApiBase } from './apiClient';
 
 const GENERIC = 'Something went wrong. Please try again.';
 
@@ -20,7 +20,7 @@ export function getAuthErrorMessage(error) {
   return GENERIC;
 }
 
-const baseUrl = () => import.meta.env.VITE_USER_SERVICE_URL;
+const baseUrl = () => resolveApiBase(import.meta.env.VITE_USER_SERVICE_URL);
 
 export function loginWithGoogle(credential) {
   return request(baseUrl(), '/auth/google', { method: 'POST', body: { credential } });

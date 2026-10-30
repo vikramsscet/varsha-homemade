@@ -12,3 +12,9 @@
 .add-to-cart{background:#7d2028;color:#fff}
 .buy-now{background:#3f2b24;color:#fff}
 @media(max-width:900px){.product-detail-grid{grid-template-columns:1fr;}.thumb-col{order:2}.image-col{order:1}.info-col{order:3;padding-top:8px}}
+.add-to-cart:disabled{opacity:.6;cursor:not-allowed}
+.actions .btn:focus-visible{outline:2px solid #c9a227;outline-offset:2px}
+.cart-feedback-wrap{margin-top:10px}
+.cart-feedback{padding:10px 12px;border-radius:6px;font-size:14px;font-weight:600}
+.cart-feedback.is-success{background:#e6f4ea;color:#1e6b34}
+.cart-feedback.is-error{background:#fdecea;color:#7a1f2b}

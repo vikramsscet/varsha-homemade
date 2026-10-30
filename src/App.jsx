@@ -7,6 +7,7 @@ import IndianSweetsPage from './pages/IndianSweets/IndianSweets';
 import ProductDetailPage from './pages/ProductDetail/ProductDetail';
 import LoginPage from './pages/Login/Login';
 import ProfilePage from './pages/Profile/Profile';
+import CartPage from './pages/Cart/Cart';
 import RequireAuth from './components/RequireAuth';
 import { navLinks, logoImage } from './data/siteData';
 
@@ -76,6 +77,7 @@ function App() {
         <Route path="/category/indian-sweets" element={<IndianSweetsPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route element={<RequireAuth />}>
           <Route path="/profile" element={<ProfilePage />} />
         </Route>

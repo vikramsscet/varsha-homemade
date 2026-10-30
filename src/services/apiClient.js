@@ -17,13 +17,39 @@ export function setUnauthorizedHandler(handler) {
   unauthorizedHandler = handler;
 }
 
-export async function request(baseUrl, path, { method = 'GET', body, silent401 = false } = {}) {
+// Accepts either "https://host" or "https://host/api/v1" and returns "https://host/api/v1"
+// (no trailing slash, prefix never duplicated). Returns '' when unset.
+export function resolveApiBase(raw) {
+  const base = (raw ?? '').trim().replace(/\/+$/, '');
+  if (!base) return '';
+  return /\/api\/v1$/.test(base) ? base : `${base}/api/v1`;
+}
+
+// Caller headers win over defaults (case-insensitive), so an explicit Authorization is kept.
+function applyHeaders(headers, extra) {
+  for (const [name, value] of Object.entries(extra ?? {})) {
+    if (value === undefined || value === null) continue;
+    for (const existing of Object.keys(headers)) {
+      if (existing.toLowerCase() === name.toLowerCase()) delete headers[existing];
+    }
+    headers[name] = value;
+  }
+}
+
+// Options: headers (extra request headers), onResponse(response) (called on success, e.g. to read
+// response headers), silent401 (skip the global unauthorized handler).
+export async function request(
+  baseUrl,
+  path,
+  { method = 'GET', body, silent401 = false, headers: extraHeaders, onResponse } = {}
+) {
   if (!baseUrl) throw new ApiError({ code: 'NOT_CONFIGURED', message: 'API base URL is not configured' });
 
   const token = tokenStorage.get();
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
+  applyHeaders(headers, extraHeaders);
 
   let response;
   try {
@@ -58,5 +84,6 @@ export async function request(baseUrl, path, { method = 'GET', body, silent401 =
   if (!payload || payload.success !== true) {
     throw new ApiError({ status: response.status, code: 'BAD_RESPONSE', message: 'Unexpected response' });
   }
+  onResponse?.(response);
   return payload.data;
 }

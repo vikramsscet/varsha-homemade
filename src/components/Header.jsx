@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AccountMenu from './AccountMenu';
+import CartLink from './CartLink';
 
 export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onCloseMenu }) {
   const location = useLocation();
@@ -26,7 +27,10 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
           {status === 'unauthenticated' && <Link to="/login" onClick={onCloseMenu}>Sign in</Link>}
         </div>
 
-        {status === 'authenticated' && <AccountMenu />}
+        <div className="nav-actions">
+          <CartLink onClick={onCloseMenu} />
+          {status === 'authenticated' && <AccountMenu />}
+        </div>
 
         <button
           className="menu-toggle"

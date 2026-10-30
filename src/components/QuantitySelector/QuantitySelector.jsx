@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './quantity-selector.css';
 
-export default function QuantitySelector({ initial = 1, onChange }) {
+export default function QuantitySelector({ initial = 1, onChange, max = 99 }) {
   const [qty, setQty] = useState(initial);
 
   useEffect(() => {
@@ -9,7 +9,7 @@ export default function QuantitySelector({ initial = 1, onChange }) {
   }, [qty]);
 
   const dec = () => setQty((q) => Math.max(1, q - 1));
-  const inc = () => setQty((q) => q + 1);
+  const inc = () => setQty((q) => Math.min(max, q + 1));
 
   return (
     <div className="quantity-selector">

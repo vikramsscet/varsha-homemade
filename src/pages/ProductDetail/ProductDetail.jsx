@@ -4,6 +4,8 @@ import ProductImageGallery from '../../components/ProductImageGallery/ProductIma
 import ProductDescription from '../../components/ProductDescription/ProductDescription';
 import QuantitySelector from '../../components/QuantitySelector/QuantitySelector';
 import SocialShare from '../../components/SocialShare/SocialShare';
+import CartFeedback from '../../components/CartFeedback';
+import { useAddToCart } from '../../hooks/useAddToCart';
 import '../../pages/ProductDetail/product-detail.css';
 
 function getDescriptionText(node) {
@@ -32,6 +34,7 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const { add, isAdding, feedback } = useAddToCart();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -105,11 +108,8 @@ export default function ProductDetailPage() {
 
   const images = product.images && product.images.length ? product.images : [product.image];
 
-  const handleAddToCart = () => {
-    // Placeholder: integrate with cart when available
-    console.log('Add to cart', { productId: product.id, quantity });
-    alert(`${product.title} — ${quantity} added to cart (placeholder)`);
-  };
+  // Only the id and quantity go to the cart; the server decides prices and totals.
+  const handleAddToCart = () => add(product.id, quantity);
 
   const handleBuyNow = () => {
     console.log('Buy now', { productId: product.id, quantity });
@@ -139,9 +139,17 @@ export default function ProductDetailPage() {
             <QuantitySelector initial={1} onChange={setQuantity} />
 
             <div className="actions">
-              <button className="btn add-to-cart" onClick={handleAddToCart}>ADD TO CART</button>
+              <button
+                className="btn add-to-cart"
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                aria-busy={isAdding}
+              >
+                {isAdding ? 'ADDING…' : 'ADD TO CART'}
+              </button>
               <button className="btn buy-now" onClick={handleBuyNow}>Buy Now</button>
             </div>
+            <CartFeedback feedback={feedback} />
 
             <ProductDescription longDescription={product.longDescription} />
 

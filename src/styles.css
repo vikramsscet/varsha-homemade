@@ -1672,7 +1672,12 @@ footer {
     height: 210px
   }
 }
-.account-menu { position: relative; margin-left: 20px; }
+.nav-actions { display: flex; align-items: center; gap: 14px; margin-left: 20px; }
+.cart-link { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; color: inherit; transition: color .2s, transform .2s; }
+.cart-link:hover { color: var(--gold); transform: scale(1.05); }
+.cart-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.cart-badge { position: absolute; top: -2px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border: 2px solid var(--cream); border-radius: 9px; box-sizing: content-box; background: var(--maroon); color: #fff; font: 700 11px/18px var(--sans); text-align: center; pointer-events: none; }
+.account-menu { position: relative; }
 .account-trigger { width: 38px; height: 38px; padding: 0; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; background: var(--cream); cursor: pointer; display: block; transition: box-shadow .2s, transform .2s; }
 .account-trigger:hover { box-shadow: 0 0 0 3px rgba(201, 162, 39, .35); transform: scale(1.05); }
 .account-trigger:focus-visible, .account-item:focus-visible { outline: 2px solid var(--maroon); outline-offset: 2px; }
@@ -1681,5 +1686,5 @@ footer {
 .account-dropdown { position: absolute; z-index: 30; top: calc(100% + 10px); right: 0; min-width: 160px; padding: 6px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 28px rgba(61, 43, 31, .18); }
 .account-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 0; border-radius: 8px; background: none; color: var(--deep); font: 500 14px var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
 .account-item:hover, .account-item:focus-visible { background: var(--cream); color: var(--maroon); }
-@media (max-width: 650px) { .account-menu { margin-left: auto; margin-right: 12px; } }
+@media (max-width: 650px) { .nav-actions { margin-left: auto; margin-right: 12px; } }
 .auth-loading { padding: 80px 16px; text-align: center; }
