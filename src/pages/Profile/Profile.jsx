@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAuthErrorMessage, getMe } from '../../services/authApi';
 import { formatDate, formatDateTime, formatStatus, getInitials, orNotProvided } from '../../services/profileFormat';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import './profile.css';
 
 function Avatar({ user }) {
@@ -56,6 +57,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <main className="profile-page container" aria-busy="true">
+        <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Profile' }]} />
         <p className="profile-loading" role="status">Loading your profile…</p>
         <div className="profile-skeleton" aria-hidden="true" />
       </main>
@@ -65,6 +67,7 @@ export default function ProfilePage() {
   if (error || !user) {
     return (
       <main className="profile-page container">
+        <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Profile' }]} />
         <section className="profile-card profile-error" role="alert">
           <p>{error || 'Could not load your profile.'}</p>
           <button type="button" className="profile-retry" onClick={load}>Retry</button>
@@ -75,6 +78,7 @@ export default function ProfilePage() {
 
   return (
     <main className="profile-page container">
+      <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Profile' }]} />
       <section className="profile-card profile-header">
         <Avatar user={user} />
         <div className="profile-identity">

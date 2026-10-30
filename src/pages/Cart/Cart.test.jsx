@@ -265,6 +265,22 @@ describe('remove and clear', () => {
   });
 });
 
+describe('breadcrumbs', () => {
+  it('renders Home / Cart once, with a non-clickable current page, in every state', () => {
+    for (const over of [{}, { cart: null, status: 'loading' }, { cart: null, status: 'error', error: { status: 500 } }]) {
+      setCtx(over);
+      const { r } = render();
+      const navs = hosts(r, (p) => p['aria-label'] === 'Breadcrumb');
+      expect(navs).toHaveLength(1);
+      expect(text(navs[0])).toBe('Home/Cart');
+      expect(hosts(r, (p) => p.href === '/')).toHaveLength(1);
+      const current = hosts(r, (p) => p['aria-current'] === 'page')[0];
+      expect(current.type).toBe('span');
+      expect(text(current)).toBe('Cart');
+    }
+  });
+});
+
 describe('merge-failure notice', () => {
   it('is absent by default', () => {
     const { r } = render();

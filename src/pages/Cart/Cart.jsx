@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import CartFeedback from '../../components/CartFeedback';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import { STALE_CART_CODES, UNCONFIRMED_CHANGE, getCartErrorMessage } from '../../services/cartErrors';
 import { formatCurrency } from '../../services/currency';
 import './cart.css';
@@ -192,6 +193,7 @@ export default function CartPage() {
   const showCount = cart && items.length > 0;
   return (
     <main className="cart-page container">
+      <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Cart' }]} />
       <h1>
         Your Cart
         {showCount && <span className="cart-count"> ({itemCount} {itemCount === 1 ? 'item' : 'items'})</span>}

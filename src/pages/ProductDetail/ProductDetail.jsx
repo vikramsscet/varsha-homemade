@@ -7,6 +7,7 @@ import SocialShare from '../../components/SocialShare/SocialShare';
 import CartFeedback from '../../components/CartFeedback';
 import { useAddToCart } from '../../hooks/useAddToCart';
 import { useCart } from '../../context/CartContext';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import '../../pages/ProductDetail/product-detail.css';
 
 function getDescriptionText(node) {
@@ -81,6 +82,7 @@ export default function ProductDetailPage() {
         setProduct({
           id: apiProduct.id,
           title: apiProduct.title,
+          slug: apiProduct.slug,
           price: `₹${apiProduct.price.toFixed(2)}`,
           weight: apiProduct.packageSize,
           image: primaryImage?.url,
@@ -102,13 +104,23 @@ export default function ProductDetailPage() {
     return () => controller.abort();
   }, [productId]);
 
+  // Never the raw UUID in the trail: the product's name (or slug) once known, a placeholder
+  // while loading, and a generic label when the product can't be shown.
+  const homeCrumb = { label: 'Home', to: '/' };
+
   if (isLoading) {
-    return <main className="container"><p role="status">Loading product...</p></main>;
+    return (
+      <main className="container product-fallback">
+        <Breadcrumbs items={[homeCrumb, { label: '…' }]} />
+        <p role="status">Loading product...</p>
+      </main>
+    );
   }
 
   if (error) {
     return (
-      <main className="container">
+      <main className="container product-fallback">
+        <Breadcrumbs items={[homeCrumb, { label: 'Product' }]} />
         <p role="alert">Unable to load this product. Please try again later.</p>
         <button onClick={() => navigate(-1)}>Go back</button>
       </main>
@@ -117,7 +129,8 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <main className="container">
+      <main className="container product-fallback">
+        <Breadcrumbs items={[homeCrumb, { label: 'Product' }]} />
         <h2>Product Not Found</h2>
         <p>The product you are looking for does not exist.</p>
         <button onClick={() => navigate(-1)}>Go back</button>
@@ -159,6 +172,10 @@ export default function ProductDetailPage() {
 
   return (
     <main className="product-detail-shell">
+      {/* Same wrapper as other pages so the trail aligns with the Cart/Profile/Category crumbs. */}
+      <div className="container">
+        <Breadcrumbs items={[homeCrumb, { label: product.title || product.slug }]} />
+      </div>
       <div className="container product-detail-grid">
         <aside className="thumb-col" aria-hidden>
           {/* thumbnails column is rendered inside the gallery */}

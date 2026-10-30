@@ -258,6 +258,70 @@ describe('product already in cart', () => {
   });
 });
 
+describe('breadcrumbs', () => {
+  const navs = (r) => hosts(r, (p) => p['aria-label'] === 'Breadcrumb');
+  const crumbText = (r) => text(navs(r)[0]);
+
+  it('shows Home / product name (never the UUID) once the product loads', async () => {
+    const r = await render();
+    expect(navs(r)).toHaveLength(1);
+    expect(crumbText(r)).toBe('Home/Kaju Katli');
+    expect(crumbText(r)).not.toContain(ID);
+    const current = hosts(r, (p) => p['aria-current'] === 'page')[0];
+    expect(current.type).toBe('span');
+    expect(text(current)).toBe('Kaju Katli');
+    expect(hosts(r, (p) => p.href === '/')).toHaveLength(1);
+  });
+
+  it('falls back to the slug when the product has no title', async () => {
+    const r = await render({ ...product, title: undefined, slug: 'kaju-katli' });
+    expect(crumbText(r)).toBe('Home/kaju-katli');
+  });
+
+  it('shows a placeholder, not the UUID, while the product is loading', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})));
+    let r;
+    await act(async () => {
+      r = TestRenderer.create(
+        <MemoryRouter initialEntries={[`/products/${ID}`]}>
+          <Routes><Route path="/products/:productId" element={<ProductDetailPage />} /></Routes>
+        </MemoryRouter>
+      );
+    });
+    expect(navs(r)).toHaveLength(1);
+    expect(crumbText(r)).not.toContain(ID);
+    expect(hosts(r, (p) => p.href === '/')).toHaveLength(1); // Home stays clickable
+  });
+
+  it('handles a failed product load without the UUID or a crash', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({}) }));
+    let r;
+    await act(async () => {
+      r = TestRenderer.create(
+        <MemoryRouter initialEntries={[`/products/${ID}`]}>
+          <Routes><Route path="/products/:productId" element={<ProductDetailPage />} /></Routes>
+        </MemoryRouter>
+      );
+    });
+    expect(navs(r)).toHaveLength(1);
+    expect(crumbText(r)).toBe('Home/Product');
+    expect(crumbText(r)).not.toContain(ID);
+  });
+});
+
+describe('breadcrumb placement', () => {
+  it('sits in its own container row above the grid, never inside it', async () => {
+    const r = await render();
+    const shell = hosts(r, (p) => p.className === 'product-detail-shell')[0];
+    const [crumbRow, grid] = shell.children; // DOM order: breadcrumb wrapper, then the grid
+    expect(crumbRow.props.className).toBe('container');
+    expect(crumbRow.findAll((n) => n.props?.['aria-label'] === 'Breadcrumb')).toHaveLength(1);
+    expect(grid.props.className).toBe('container product-detail-grid');
+    expect(grid.findAll((n) => n.props?.['aria-label'] === 'Breadcrumb')).toHaveLength(0);
+    expect(hosts(r, (p) => p['aria-label'] === 'Breadcrumb')).toHaveLength(1);
+  });
+});
+
 describe('page structure', () => {
   it('leaves Buy Now and the rest of the page intact', async () => {
     const r = await render();

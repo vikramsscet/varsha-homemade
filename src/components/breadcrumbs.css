@@ -1,0 +1,9 @@
+/* Matches the former static .breadcrumb style on the category page. */
+.breadcrumbs { margin: 0 0 18px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #8d7a6b; }
+.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 0; }
+.breadcrumbs li { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.breadcrumbs a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.breadcrumbs a:hover { color: var(--maroon); }
+.breadcrumbs a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+.breadcrumbs [aria-current='page'] { color: var(--deep); font-weight: 700; overflow-wrap: anywhere; }
+.breadcrumbs-sep { user-select: none; }
