@@ -1672,3 +1672,7 @@ footer {
     height: 210px
   }
 }
+.auth-user { display: inline-flex; align-items: center; gap: 8px; }
+.auth-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.auth-avatar-fallback { display: inline-flex; align-items: center; justify-content: center; background: #ddd; font-size: 14px; }
+.auth-loading { padding: 80px 16px; text-align: center; }

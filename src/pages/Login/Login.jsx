@@ -1,13 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton';
 import { useAuth } from '../../context/AuthContext';
-import { loginWithGoogle } from '../../services/authApi';
+import { getAuthErrorMessage } from '../../services/authApi';
 import './login.css';
 
 export default function LoginPage() {
-  const { isAuthenticated, signIn } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuth();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,17 +20,16 @@ export default function LoginPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const { token, user } = await loginWithGoogle(credential);
-        signIn(token, user);
-        navigate(redirectTo, { replace: true });
+        // On success the guard below redirects to the intended page.
+        await login(credential);
       } catch (err) {
-        setError(err.name === 'AuthError' ? err.message : 'Something went wrong. Please try again.');
+        setError(getAuthErrorMessage(err));
       } finally {
         inFlight.current = false;
         setIsLoading(false);
       }
     },
-    [navigate, redirectTo, signIn]
+    [login]
   );
 
   if (isAuthenticated) return <Navigate to={redirectTo} replace />;

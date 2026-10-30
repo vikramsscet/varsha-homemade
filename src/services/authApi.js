@@ -1,47 +1,31 @@
-export class AuthError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
+import { ApiError, request } from './apiClient';
+
+const GENERIC = 'Something went wrong. Please try again.';
 
 const MESSAGES = {
-  INVALID_GOOGLE_CREDENTIAL: 'Google sign-in could not be verified. Please try again.',
-  EMAIL_NOT_VERIFIED: 'Your Google email address is not verified.',
+  INVALID_GOOGLE_CREDENTIAL: 'Sign-in failed, please try again.',
+  EMAIL_NOT_VERIFIED: 'Please verify your Google email address and try again.',
+  ACCOUNT_DISABLED: 'Your account is disabled. Please contact support.',
   ACCOUNT_CONFLICT: 'This email is linked to a different Google account.',
-  ACCOUNT_DISABLED: 'This account is not active.',
-  RATE_LIMITED: 'Too many sign-in attempts. Please try again later.',
+  RATE_LIMITED: 'Too many attempts. Please try again later.',
 };
 
-export async function loginWithGoogle(credential) {
-  const baseUrl = import.meta.env.VITE_USER_SERVICE_URL;
-  if (!baseUrl) throw new AuthError('Sign-in service is not configured.');
+// Maps any thrown error to user-facing text. Unknown/config/dev-bug codes get the generic
+// message, with the code (never the credential or token) logged for developers.
+export function getAuthErrorMessage(error) {
+  if (!(error instanceof ApiError)) return GENERIC;
+  const message = MESSAGES[error.code];
+  if (message) return message;
+  console.error('Auth request failed', { status: error.status, code: error.code, details: error.details });
+  return GENERIC;
+}
 
-  let response;
-  try {
-    response = await fetch(`${baseUrl}/auth/google`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify({ credential }),
-    });
-  } catch {
-    throw new AuthError('Unable to reach the sign-in service. Check your connection and try again.');
-  }
+const baseUrl = () => import.meta.env.VITE_USER_SERVICE_URL;
 
-  let body = null;
-  try {
-    body = await response.json();
-  } catch {
-    // handled below
-  }
+export function loginWithGoogle(credential) {
+  return request(baseUrl(), '/auth/google', { method: 'POST', body: { credential } });
+}
 
-  if (!response.ok) {
-    throw new AuthError(MESSAGES[body?.error?.code] ?? 'Sign-in failed. Please try again.');
-  }
-
-  const data = body?.data;
-  if (!body?.success || typeof data?.token !== 'string' || !data.user) {
-    throw new AuthError('Received an unexpected response from the sign-in service.');
-  }
-  return { token: data.token, user: data.user };
+export function getMe(options) {
+  return request(baseUrl(), '/auth/me', options);
 }
