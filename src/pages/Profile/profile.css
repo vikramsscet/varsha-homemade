@@ -1,0 +1,30 @@
+.profile-page { max-width: 760px; padding: 140px 16px 80px; display: grid; gap: 20px; }
+.profile-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+.profile-card h2 { margin: 0 0 12px; font: 600 22px/1.2 var(--serif); color: var(--maroon); }
+.profile-header { display: flex; align-items: center; gap: 24px; }
+.profile-avatar { width: 112px; height: 112px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); }
+.profile-avatar-fallback { display: flex; align-items: center; justify-content: center; background: var(--cream); color: var(--maroon); font: 600 38px var(--serif); }
+.profile-identity { min-width: 0; }
+.profile-identity h1 { margin: 0 0 4px; font: 600 30px/1.2 var(--serif); color: var(--maroon); overflow-wrap: anywhere; }
+.profile-identity p { margin: 0 0 12px; color: var(--muted); overflow-wrap: anywhere; }
+.profile-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.profile-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.profile-badge.is-good { background: #e6f4ea; color: #1e6b34; }
+.profile-badge.is-warn { background: #fdecea; color: var(--maroon); }
+.profile-list { margin: 0; }
+.profile-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.profile-row:first-child { border-top: 0; }
+.profile-row dt { color: var(--muted); }
+.profile-row dd { margin: 0; color: var(--deep); overflow-wrap: anywhere; }
+.profile-row.is-secondary dd { font-size: 13px; color: var(--muted); }
+.profile-loading { text-align: center; color: var(--muted); }
+.profile-skeleton { height: 220px; border-radius: 16px; background: linear-gradient(90deg, var(--line), #fff, var(--line)); background-size: 200% 100%; animation: profile-shimmer 1.2s infinite; }
+@keyframes profile-shimmer { to { background-position: -200% 0; } }
+.profile-error { text-align: center; color: var(--maroon); }
+.profile-retry { padding: 10px 24px; border: 0; border-radius: 999px; background: var(--maroon); color: #fff; font: inherit; cursor: pointer; }
+@media (max-width: 600px) {
+  .profile-page { padding-top: 110px; }
+  .profile-header { flex-direction: column; text-align: center; }
+  .profile-badges { justify-content: center; }
+  .profile-row { grid-template-columns: 1fr; gap: 2px; }
+}

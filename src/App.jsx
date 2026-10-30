@@ -6,14 +6,30 @@ import HomePage from './pages/Home/Home';
 import IndianSweetsPage from './pages/IndianSweets/IndianSweets';
 import ProductDetailPage from './pages/ProductDetail/ProductDetail';
 import LoginPage from './pages/Login/Login';
+import ProfilePage from './pages/Profile/Profile';
+import RequireAuth from './components/RequireAuth';
 import { navLinks, logoImage } from './data/siteData';
 
 function ScrollToTop() {
   const location = useLocation();
 
   useEffect(() => {
+    if (location.hash) {
+      // Section links (e.g. /#about) clicked from any page: wait for the target page to render.
+      const id = location.hash.slice(1);
+      let tries = 0;
+      const timer = setInterval(() => {
+        const el = document.getElementById(id);
+        if (el || ++tries > 20) {
+          clearInterval(timer);
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 50);
+      return () => clearInterval(timer);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location.pathname]);
+    return undefined;
+  }, [location.pathname, location.hash]);
 
   return null;
 }
@@ -60,6 +76,9 @@ function App() {
         <Route path="/category/indian-sweets" element={<IndianSweetsPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
       </Routes>
       <Footer logo={logoImage} />
 

@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AccountMenu from './AccountMenu';
 
 export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onCloseMenu }) {
   const location = useLocation();
-  const { status, user, logout } = useAuth();
+  const { status } = useAuth();
 
   const handleBrandClick = () => {
     onCloseMenu();
@@ -18,6 +19,15 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
           <img src={logo} alt="Varsha's Homemade logo" />
         </Link>
 
+        <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
+          {navLinks.map((link) => (
+            <Link key={link.href} to={{ pathname: '/', hash: link.href }} onClick={onCloseMenu}>{link.label}</Link>
+          ))}
+          {status === 'unauthenticated' && <Link to="/login" onClick={onCloseMenu}>Sign in</Link>}
+        </div>
+
+        {status === 'authenticated' && <AccountMenu />}
+
         <button
           className="menu-toggle"
           aria-label="Open menu"
@@ -26,28 +36,6 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
         >
           <i></i><i></i><i></i>
         </button>
-
-        <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} onClick={onCloseMenu}>{link.label}</a>
-          ))}
-          {status === 'authenticated' && user && (
-            <>
-              <span className="auth-user">
-                {user.profileImageUrl ? (
-                  <img className="auth-avatar" src={user.profileImageUrl} alt="" referrerPolicy="no-referrer" />
-                ) : (
-                  <span className="auth-avatar auth-avatar-fallback" aria-hidden="true">
-                    {(user.displayName || user.email).charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <span>{user.displayName || user.email}</span>
-              </span>
-              <button type="button" className="auth-link" onClick={() => { logout(); onCloseMenu(); }}>Sign out</button>
-            </>
-          )}
-          {status === 'unauthenticated' && <Link to="/login" onClick={onCloseMenu}>Sign in</Link>}
-        </div>
       </nav>
     </header>
   );
