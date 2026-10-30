@@ -7,16 +7,15 @@ import { tokenStorage } from '../services/tokenStorage';
 
 const AuthContext = createContext(null);
 
-// onLoginSuccess({ token, user }) is the hook for later work, e.g. merging the anonymous cart.
-export function AuthProvider({ children, onLoginSuccess }) {
+// The guest-cart merge after login is owned by CartContext (it reacts to the identity
+// transition), so login itself has no post-success callback.
+export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, undefined, initialAuthState);
   const navigate = useNavigate();
   const location = useLocation();
   const locationRef = useRef(location);
   locationRef.current = location;
   const loginInFlight = useRef(false);
-  const onLoginSuccessRef = useRef(onLoginSuccess);
-  onLoginSuccessRef.current = onLoginSuccess;
 
   const logout = useCallback(() => {
     tokenStorage.clear();
@@ -31,7 +30,6 @@ export function AuthProvider({ children, onLoginSuccess }) {
       const { token, user } = await loginWithGoogle(credential);
       tokenStorage.set(token);
       dispatch({ type: 'LOGIN_SUCCESS', token, user });
-      await onLoginSuccessRef.current?.({ token, user });
       return user;
     } finally {
       loginInFlight.current = false;

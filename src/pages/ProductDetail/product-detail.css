@@ -18,3 +18,5 @@
 .cart-feedback{padding:10px 12px;border-radius:6px;font-size:14px;font-weight:600}
 .cart-feedback.is-success{background:#e6f4ea;color:#1e6b34}
 .cart-feedback.is-error{background:#fdecea;color:#7a1f2b}
+.in-cart-note{margin:8px 0 0;font-size:13px;font-weight:600;color:#1e6b34}
+.add-to-cart[disabled]{opacity:.65}

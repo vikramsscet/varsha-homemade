@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductImageGallery from '../../components/ProductImageGallery/ProductImageGallery';
 import ProductDescription from '../../components/ProductDescription/ProductDescription';
@@ -6,6 +6,7 @@ import QuantitySelector from '../../components/QuantitySelector/QuantitySelector
 import SocialShare from '../../components/SocialShare/SocialShare';
 import CartFeedback from '../../components/CartFeedback';
 import { useAddToCart } from '../../hooks/useAddToCart';
+import { useCart } from '../../context/CartContext';
 import '../../pages/ProductDetail/product-detail.css';
 
 function getDescriptionText(node) {
@@ -33,8 +34,26 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const { add, isAdding, feedback } = useAddToCart();
+  const { add, update, isSubmitting, feedback } = useAddToCart();
+  const { items } = useCart();
+  // `selected` is what the customer has chosen; the confirmed quantity always comes from the
+  // cart context. dirtyRef marks that the customer touched the selector since the last sync, so
+  // an unrelated cart refresh never resets a quantity they are editing.
+  const [selected, setSelected] = useState(1);
+  const dirtyRef = useRef(false);
+  const pendingLabelRef = useRef('ADDING…');
+
+  const cartItem = product ? items.find((item) => item.productId === product.id) : undefined;
+  const cartQuantity = cartItem?.quantity ?? 0;
+
+  useEffect(() => {
+    dirtyRef.current = false; // a different product page starts clean
+  }, [productId]);
+
+  // Follow the server-confirmed quantity whenever the customer is not mid-edit.
+  useEffect(() => {
+    if (!dirtyRef.current) setSelected(cartQuantity > 0 ? cartQuantity : 1);
+  }, [cartQuantity, productId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -108,12 +127,34 @@ export default function ProductDetailPage() {
 
   const images = product.images && product.images.length ? product.images : [product.image];
 
-  // Only the id and quantity go to the cart; the server decides prices and totals.
-  const handleAddToCart = () => add(product.id, quantity);
+  // CTA state is derived, never stored: not in cart -> add; selection matches the confirmed
+  // quantity -> added (inert); otherwise -> update.
+  const mode = !cartItem ? 'add' : selected === cartQuantity ? 'added' : 'update';
+
+  const handleQuantityChange = (next) => {
+    dirtyRef.current = true;
+    setSelected(next);
+  };
+
+  // Only ids and the quantity go to the cart; the server decides prices and totals. Add vs
+  // update is re-decided here from the item's CURRENT presence, so an item removed elsewhere is
+  // re-added instead of updated against a stale cart item id.
+  const handleCartAction = async () => {
+    if (isSubmitting || mode === 'added') return;
+    const current = items.find((item) => item.productId === product.id);
+    pendingLabelRef.current = current ? 'UPDATING…' : 'ADDING…';
+    const result = current ? await update(current.id, selected) : await add(product.id, selected);
+    if (result) {
+      // Success: the selection now mirrors the server's confirmed quantity.
+      dirtyRef.current = false;
+      const confirmed = result.items?.find((item) => item.productId === product.id)?.quantity;
+      if (typeof confirmed === 'number') setSelected(confirmed);
+    }
+  };
 
   const handleBuyNow = () => {
-    console.log('Buy now', { productId: product.id, quantity });
-    alert(`Buy now: ${product.title} — ${quantity} (placeholder)`);
+    // Out of scope: checkout is not implemented.
+    alert(`Buy now: ${product.title} — ${selected} (placeholder)`);
   };
 
   return (
@@ -136,16 +177,27 @@ export default function ProductDetailPage() {
             </div>
 
             <label className="quantity-label">Quantity *</label>
-            <QuantitySelector initial={1} onChange={setQuantity} />
+            <QuantitySelector value={selected} onChange={handleQuantityChange} disabled={isSubmitting} />
+            {cartItem && (
+              <p className="in-cart-note" data-testid="in-cart-note">
+                <span aria-hidden="true">✓ </span>In your cart: {cartItem.quantity}
+              </p>
+            )}
 
             <div className="actions">
               <button
                 className="btn add-to-cart"
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                aria-busy={isAdding}
+                onClick={handleCartAction}
+                disabled={isSubmitting || mode === 'added'}
+                aria-busy={isSubmitting}
               >
-                {isAdding ? 'ADDING…' : 'ADD TO CART'}
+                {isSubmitting
+                  ? pendingLabelRef.current
+                  : mode === 'add'
+                    ? 'ADD TO CART'
+                    : mode === 'update'
+                      ? 'UPDATE CART'
+                      : 'ADDED TO CART'}
               </button>
               <button className="btn buy-now" onClick={handleBuyNow}>Buy Now</button>
             </div>

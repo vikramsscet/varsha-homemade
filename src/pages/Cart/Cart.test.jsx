@@ -308,3 +308,27 @@ describe('boundaries', () => {
     for (const fn of Object.values(cartApi)) if (typeof fn === 'function' && 'mock' in fn) expect(fn).not.toHaveBeenCalled();
   });
 });
+
+describe('ambiguous outcomes and accessibility details', () => {
+  it('a network failure on a mutation says the change is unconfirmed, keeping the confirmed cart', async () => {
+    ctx.updateItem.mockRejectedValue(new ApiError({ status: 0, code: 'NETWORK_ERROR', message: 'offline' }));
+    const { r } = render();
+    await click(byLabel(r, 'Increase quantity of Kaju Katli'));
+    expect(alertText(r)).toContain("We couldn't confirm that change. Please check your cart before trying again.");
+    expect(pageText(r)).toContain('Kaju Katli');
+    expect(ctx.updateItem).toHaveBeenCalledTimes(1); // never replayed
+  });
+
+  it('quantity controls are grouped and named per product', () => {
+    const { r } = render();
+    const groups = hosts(r, (p) => p.role === 'group').map((n) => n.props['aria-label']);
+    expect(groups).toEqual(['Quantity of Kaju Katli', 'Quantity of Besan Ladoo']);
+  });
+
+  it('the clear-cart confirmation puts initial focus on the non-destructive Cancel', async () => {
+    const { r } = render();
+    await click(button(r, 'cart-clear'));
+    expect(button(r, 'cart-clear-cancel').props.autoFocus).toBe(true);
+    expect(button(r, 'cart-clear-yes').props.autoFocus).toBeUndefined();
+  });
+});

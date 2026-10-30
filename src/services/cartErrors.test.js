@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GENERIC_ADD_ERROR, getAddToCartErrorMessage } from './cartErrors';
+import { GENERIC_ADD_ERROR, UNCONFIRMED_CHANGE, getAddToCartErrorMessage } from './cartErrors';
 
 const e = (code, status = 400) => ({ code, status, message: 'internal detail: stack at x.js' });
 
@@ -22,10 +22,15 @@ describe('getAddToCartErrorMessage', () => {
     expect(getAddToCartErrorMessage(e('RATE_LIMITED', 429))).toMatch(/Too many requests/);
   });
 
-  it.each([e('INTERNAL_ERROR', 500), e('NETWORK_ERROR', 0), e('SOMETHING_NEW'), null, undefined, new Error('boom')])(
-    'falls back to the generic message for unknown/500/network errors',
+  it.each([e('INTERNAL_ERROR', 500), e('SOMETHING_NEW'), null, undefined, new Error('boom')])(
+    'falls back to the generic message for unknown or confirmed-server errors',
     (err) => expect(getAddToCartErrorMessage(err)).toBe(GENERIC_ADD_ERROR)
   );
+
+  it('an ambiguous network failure says the change is unconfirmed, not failed', () => {
+    expect(getAddToCartErrorMessage(e('NETWORK_ERROR', 0))).toBe(UNCONFIRMED_CHANGE);
+    expect(UNCONFIRMED_CHANGE).toContain('check your cart');
+  });
 
   it('never leaks the raw backend message', () => {
     expect(getAddToCartErrorMessage(e('SOMETHING_NEW'))).not.toContain('stack');

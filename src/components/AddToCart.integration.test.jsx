@@ -61,3 +61,25 @@ describe('add to cart -> context -> header badge', () => {
     expect(cartApi.addItem).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('update item -> context -> header badge', () => {
+  it('updating an existing line flows through the real provider and the server count wins', async () => {
+    cartApi.getCurrentCart.mockResolvedValue({ ...cart(2), items: [{ id: 'i1', productId: 'p1', quantity: 2 }] });
+    cartApi.updateItem.mockResolvedValue(cart(5));
+    const r = await mount();
+    await act(async () => { await hook.update('i1', 5); });
+    expect(cartApi.updateItem).toHaveBeenCalledWith('cart-1', 'i1', 5);
+    expect(cartApi.addItem).not.toHaveBeenCalled(); // no duplicate line
+    expect(badge(r)).toBe('5');
+    expect(hook.feedback).toMatchObject({ type: 'success', message: 'Cart updated.' });
+  });
+
+  it('a failed update keeps the confirmed badge and reports an error', async () => {
+    cartApi.getCurrentCart.mockResolvedValue({ ...cart(2), items: [{ id: 'i1', productId: 'p1', quantity: 2 }] });
+    cartApi.updateItem.mockRejectedValue(new ApiError({ status: 404, code: 'CART_ITEM_NOT_FOUND', message: 'x' }));
+    const r = await mount();
+    await act(async () => { await hook.update('i1', 5); });
+    expect(badge(r)).toBe('2');
+    expect(hook.feedback.type).toBe('error');
+  });
+});

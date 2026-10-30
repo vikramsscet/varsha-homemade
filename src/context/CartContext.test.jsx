@@ -583,3 +583,23 @@ describe('logout lifecycle', () => {
     expect(cartApi.mergeCart).toHaveBeenCalledTimes(1); // logout never merges
   });
 });
+
+describe('merge notice dismissal', () => {
+  it('dismissing a failed-merge notice clears the status but never the anonymous id', async () => {
+    cartApi.getCurrentCart.mockResolvedValueOnce(cart({ id: 'guest-db-1', itemCount: 2 }));
+    let m;
+    await act(async () => { m = mount(true); });
+    cartApi.mergeCart.mockRejectedValue(apiError(500, 'INTERNAL_ERROR'));
+    cartApi.getCurrentCart.mockResolvedValue(cart({ id: 'user-cart-1', ownerType: 'USER' }));
+    Object.assign(auth, { status: 'authenticated', user: { id: 'u1' } });
+    tokenStorage.set('tok');
+    await act(async () => { m.rerender(); });
+    expect(m.box.ctx.mergeStatus).toBe('failed');
+    await act(async () => { m.box.ctx.dismissMergeError(); });
+    expect(m.box.ctx.mergeStatus).toBeNull();
+    expect(m.box.ctx.mergeError).toBeNull();
+    expect(getAnonymousCartId()).toBe(ANON); // recovery path stays open
+    await run(() => m.box.ctx.retryMerge()); // and an explicit retry still works after dismissal
+    expect(cartApi.mergeCart).toHaveBeenCalledTimes(1 + 1);
+  });
+});

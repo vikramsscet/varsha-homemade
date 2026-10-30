@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import CartFeedback from '../../components/CartFeedback';
-import { STALE_CART_CODES, getCartErrorMessage } from '../../services/cartErrors';
+import { STALE_CART_CODES, UNCONFIRMED_CHANGE, getCartErrorMessage } from '../../services/cartErrors';
 import { formatCurrency } from '../../services/currency';
 import './cart.css';
 
@@ -19,7 +19,7 @@ function CartItemRow({ item, currency, pending, onQuantity, onRemove }) {
         <h3>{name}</h3>
         <p className="cart-item-unit">{formatCurrency(item.unitPrice, currency)} each</p>
       </div>
-      <div className="cart-qty">
+      <div className="cart-qty" role="group" aria-label={`Quantity of ${name}`}>
         <button
           type="button"
           className="cart-qty-btn"
@@ -95,7 +95,7 @@ export default function CartPage() {
         if (successMessage) show('success', successMessage);
         else if (mounted.current) setFeedback(null);
       } catch (err) {
-        show('error', getCartErrorMessage(err));
+        show('error', err?.code === 'NETWORK_ERROR' ? UNCONFIRMED_CHANGE : getCartErrorMessage(err));
         if (STALE_CART_CODES.includes(err?.code)) refreshCart().catch(() => {});
       }
     },
@@ -161,7 +161,8 @@ export default function CartPage() {
                 >
                   Yes, clear cart
                 </button>
-                <button type="button" className="cart-clear-cancel" onClick={() => setConfirmingClear(false)}>
+                {/* Focus moves into the confirmation; Cancel first so Enter is non-destructive. */}
+                <button type="button" className="cart-clear-cancel" autoFocus onClick={() => setConfirmingClear(false)}>
                   Cancel
                 </button>
               </div>

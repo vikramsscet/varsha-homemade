@@ -4,11 +4,15 @@ import { GENERIC_ADD_ERROR, STALE_CART_CODES, getAddToCartErrorMessage } from '.
 
 const SUCCESS_MS = 4000;
 
-// Per-control add-to-cart state. Only productId and quantity ever reach the cart context; the
-// server owns pricing. A failed add is never retried here: the customer retries explicitly.
+const validId = (id) => typeof id === 'string' && id.trim() !== '';
+const validQuantity = (q) => Number.isInteger(q) && q >= 1 && q <= 99;
+
+// Per-control add/update state for product pages. Only ids and a quantity ever reach the cart
+// context; the server owns pricing. Failures are never retried here: the customer retries
+// explicitly. Both operations resolve with the server cart on success and null on failure.
 export function useAddToCart() {
-  const { addItem, refreshCart } = useCart();
-  const [isAdding, setIsAdding] = useState(false);
+  const { addItem, updateItem, refreshCart } = useCart();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null); // { id, type: 'success' | 'error', message }
   const inFlight = useRef(false);
   const mounted = useRef(true);
@@ -30,22 +34,18 @@ export function useAddToCart() {
     if (type === 'success') timer.current = setTimeout(() => setFeedback(null), SUCCESS_MS);
   }, []);
 
-  const add = useCallback(
-    async (productId, quantity = 1) => {
+  const perform = useCallback(
+    async (mutate, successMessage) => {
       if (inFlight.current) return null;
-      if (typeof productId !== 'string' || !productId.trim() || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
-        show('error', GENERIC_ADD_ERROR);
-        return null;
-      }
       inFlight.current = true;
       clearTimeout(timer.current);
       if (mounted.current) {
-        setIsAdding(true);
+        setIsSubmitting(true);
         setFeedback(null);
       }
       try {
-        const cart = await addItem(productId, quantity);
-        show('success', 'Added to cart successfully.'); // only after the server confirmed
+        const cart = await mutate();
+        show('success', successMessage); // only after the server confirmed
         return cart;
       } catch (error) {
         show('error', getAddToCartErrorMessage(error));
@@ -53,11 +53,34 @@ export function useAddToCart() {
         return null;
       } finally {
         inFlight.current = false;
-        if (mounted.current) setIsAdding(false);
+        if (mounted.current) setIsSubmitting(false);
       }
     },
-    [addItem, refreshCart, show]
+    [refreshCart, show]
   );
 
-  return { add, isAdding, feedback, dismiss: () => setFeedback(null) };
+  const add = useCallback(
+    (productId, quantity = 1) => {
+      if (!validId(productId) || !validQuantity(quantity)) {
+        show('error', GENERIC_ADD_ERROR);
+        return Promise.resolve(null);
+      }
+      return perform(() => addItem(productId, quantity), 'Added to cart successfully.');
+    },
+    [addItem, perform, show]
+  );
+
+  // Absolute quantity for an existing cart line (cart item id, never the product id).
+  const update = useCallback(
+    (itemId, quantity) => {
+      if (!validId(itemId) || !validQuantity(quantity)) {
+        show('error', GENERIC_ADD_ERROR);
+        return Promise.resolve(null);
+      }
+      return perform(() => updateItem(itemId, quantity), 'Cart updated.');
+    },
+    [perform, show, updateItem]
+  );
+
+  return { add, update, isSubmitting, feedback, dismiss: () => setFeedback(null) };
 }

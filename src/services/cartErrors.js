@@ -15,6 +15,10 @@ const MESSAGES = {
 
 export const GENERIC_CART_ERROR = "Couldn't update your cart. Please try again.";
 
+// A network failure on a mutation is ambiguous: the backend may have applied the change even
+// though no response arrived. Say so, instead of claiming the change definitely failed.
+export const UNCONFIRMED_CHANGE = "We couldn't confirm that change. Please check your cart before trying again.";
+
 // Customer-facing text from the backend error code (never the raw message or payload).
 export function getCartErrorMessage(error, fallback = GENERIC_CART_ERROR) {
   if (error?.status === 429) return 'Too many requests. Please wait a moment and try again.';
@@ -22,6 +26,7 @@ export function getCartErrorMessage(error, fallback = GENERIC_CART_ERROR) {
 }
 
 export function getAddToCartErrorMessage(error) {
+  if (error?.code === 'NETWORK_ERROR') return UNCONFIRMED_CHANGE;
   return getCartErrorMessage(error, GENERIC_ADD_ERROR);
 }
 
