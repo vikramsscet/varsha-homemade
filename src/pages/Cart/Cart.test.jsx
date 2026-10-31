@@ -138,11 +138,11 @@ describe('rendering states', () => {
     expect(pageText(r)).toContain('—');
   });
 
-  it('keeps the checkout button clearly disabled', () => {
+  it('shows an enabled Checkout link to /checkout', () => {
     const { r } = render();
-    const checkout = button(r, 'cart-checkout');
-    expect(checkout.props.disabled).toBe(true);
-    expect(text(checkout)).toContain('coming soon');
+    const link = r.root.findAll((n) => n.props?.className === 'cart-checkout' && n.props.to)[0];
+    expect(link.props.to).toBe('/checkout');
+    expect(text(r.root.findAll((n) => n.type === 'a' && n.props.className === 'cart-checkout')[0])).toBe('Checkout');
   });
 });
 

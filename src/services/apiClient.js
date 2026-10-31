@@ -37,15 +37,16 @@ function applyHeaders(headers, extra) {
 }
 
 // Options: headers (extra request headers), onResponse(response) (called on success, e.g. to read
-// response headers), silent401 (skip the global unauthorized handler).
+// response headers), silent401 (skip the global unauthorized handler), auth (default true; false
+// never attaches the stored Bearer token, for credentials that must not be mixed with the JWT).
 export async function request(
   baseUrl,
   path,
-  { method = 'GET', body, silent401 = false, headers: extraHeaders, onResponse } = {}
+  { method = 'GET', body, silent401 = false, auth = true, headers: extraHeaders, onResponse } = {}
 ) {
   if (!baseUrl) throw new ApiError({ code: 'NOT_CONFIGURED', message: 'API base URL is not configured' });
 
-  const token = tokenStorage.get();
+  const token = auth ? tokenStorage.get() : null;
   const headers = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;

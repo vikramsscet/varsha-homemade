@@ -333,3 +333,62 @@ describe('page structure', () => {
     expect(text(hosts(r, (p) => p.className === 'product-info')[0])).toContain('Kaju Katli');
   });
 });
+
+describe('Buy Now', () => {
+  const buyNow = (r) => hosts(r, (p) => p.className === 'btn buy-now')[0];
+  const goto = { path: null };
+  beforeEach(() => { cartCtx.items = []; cartCtx.addItem = vi.fn(); cartCtx.updateItem = vi.fn(); });
+
+  async function renderAt() {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => product }));
+    await act(async () => {
+      renderer = TestRenderer.create(
+        <MemoryRouter initialEntries={['/products/abc']}>
+          <Routes>
+            <Route path="/products/:productId" element={<ProductDetailPage />} />
+            <Route path="/checkout" element={<p data-testid="checkout-page">checkout</p>} />
+          </Routes>
+        </MemoryRouter>
+      );
+    });
+    return renderer;
+  }
+  const onCheckout = (r) => hosts(r, (p) => p['data-testid'] === 'checkout-page').length === 1;
+
+  it('adds a new product at the selected quantity, then goes to checkout', async () => {
+    cartCtx.addItem.mockResolvedValue(serverCart(1));
+    const r = await renderAt();
+    await click(() => buyNow(r));
+    expect(cartCtx.addItem).toHaveBeenCalledWith(ID, 1);
+    expect(cartCtx.updateItem).not.toHaveBeenCalled();
+    expect(onCheckout(r)).toBe(true);
+  });
+
+  it('updates an existing line instead of adding a duplicate', async () => {
+    cartCtx.items = inCart(1);
+    cartCtx.updateItem.mockResolvedValue(serverCart(3));
+    const r = await renderAt();
+    await inc(r); await inc(r);
+    await click(() => buyNow(r));
+    expect(cartCtx.updateItem).toHaveBeenCalledWith('item-9', 3);
+    expect(cartCtx.addItem).not.toHaveBeenCalled();
+    expect(onCheckout(r)).toBe(true);
+  });
+
+  it('skips the API when the cart already has the selected quantity', async () => {
+    cartCtx.items = inCart(2);
+    const r = await renderAt();
+    await click(() => buyNow(r));
+    expect(cartCtx.addItem).not.toHaveBeenCalled();
+    expect(cartCtx.updateItem).not.toHaveBeenCalled();
+    expect(onCheckout(r)).toBe(true);
+  });
+
+  it('stays on the page and shows an error when the cart call fails', async () => {
+    cartCtx.addItem.mockRejectedValue(apiError(500, 'INTERNAL_ERROR'));
+    const r = await renderAt();
+    await click(() => buyNow(r));
+    expect(onCheckout(r)).toBe(false);
+    expect(alertText(r)).not.toBe('');
+  });
+});

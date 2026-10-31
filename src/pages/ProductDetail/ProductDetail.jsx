@@ -166,9 +166,21 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleBuyNow = () => {
-    // Out of scope: checkout is not implemented.
-    alert(`Buy now: ${product.title} — ${selected} (placeholder)`);
+  // Reuses the same add/update path as the cart button (no duplicate lines: an existing line is
+  // updated to the selected quantity), and only navigates once the server confirmed the cart.
+  const handleBuyNow = async () => {
+    if (isSubmitting) return;
+    const current = items.find((item) => item.productId === product.id);
+    if (current && current.quantity === selected) {
+      navigate('/checkout'); // already exactly what the customer asked for
+      return;
+    }
+    pendingLabelRef.current = current ? 'UPDATING…' : 'ADDING…';
+    const result = current ? await update(current.id, selected) : await add(product.id, selected);
+    if (result) {
+      dirtyRef.current = false;
+      navigate('/checkout');
+    }
   };
 
   return (
@@ -217,7 +229,7 @@ export default function ProductDetailPage() {
                       ? 'UPDATE CART'
                       : 'ADDED TO CART'}
               </button>
-              <button className="btn buy-now" onClick={handleBuyNow}>Buy Now</button>
+              <button className="btn buy-now" onClick={handleBuyNow} disabled={isSubmitting}>Buy Now</button>
             </div>
             <CartFeedback feedback={feedback} />
 

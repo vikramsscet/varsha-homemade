@@ -8,6 +8,8 @@ import ProductDetailPage from './pages/ProductDetail/ProductDetail';
 import LoginPage from './pages/Login/Login';
 import ProfilePage from './pages/Profile/Profile';
 import CartPage from './pages/Cart/Cart';
+import CheckoutPage from './pages/Checkout/Checkout';
+import AddressesPage from './pages/Checkout/AddressesPage';
 import RequireAuth from './components/RequireAuth';
 import { navLinks, logoImage } from './data/siteData';
 
@@ -78,8 +80,10 @@ function App() {
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route element={<RequireAuth />}>
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/addresses" element={<AddressesPage />} />
         </Route>
       </Routes>
       <Footer logo={logoImage} />

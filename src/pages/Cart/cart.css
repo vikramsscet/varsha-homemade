@@ -30,7 +30,7 @@
 .cart-summary-row dd { margin: 0; font-weight: 600; }
 .cart-summary-total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 12px; font-size: 18px; }
 .cart-summary-total dt { color: var(--deep); font-weight: 600; }
-.cart-checkout { width: 100%; margin-top: 16px; padding: 12px; border: 0; border-radius: 999px; background: var(--line); color: var(--muted); font: 600 14px var(--sans); cursor: not-allowed; }
+.cart-checkout { width: 100%; margin-top: 16px; padding: 12px; border: 0; border-radius: 999px; background: var(--maroon); color: #fff; font: 600 14px var(--sans); cursor: pointer; display: block; box-sizing: border-box; text-align: center; text-decoration: none; }
 .cart-empty, .cart-error-state, .cart-loading-state { text-align: center; padding: 48px 24px; color: var(--deep); }
 .cart-continue, .cart-retry { display: inline-block; margin-top: 12px; padding: 10px 24px; border: 0; border-radius: 999px; background: var(--maroon); color: #fff; font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
 .cart-skeleton { height: 140px; margin-top: 16px; border-radius: 12px; background: linear-gradient(90deg, var(--line), #fff, var(--line)); background-size: 200% 100%; animation: cart-shimmer 1.2s infinite; }

@@ -184,7 +184,7 @@ export default function CartPage() {
             <div className="cart-summary-row"><dt>Tax</dt><dd>{formatCurrency(taxAmount, currency)}</dd></div>
             <div className="cart-summary-row cart-summary-total"><dt>Total</dt><dd>{formatCurrency(totalAmount, currency)}</dd></div>
           </dl>
-          <button type="button" className="cart-checkout" disabled>Checkout — coming soon</button>
+          <Link to="/checkout" className="cart-checkout">Checkout</Link>
         </aside>
       </div>
     );
