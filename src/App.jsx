@@ -7,6 +7,8 @@ import IndianSweetsPage from './pages/IndianSweets/IndianSweets';
 import ProductDetailPage from './pages/ProductDetail/ProductDetail';
 import LoginPage from './pages/Login/Login';
 import ProfilePage from './pages/Profile/Profile';
+import OrdersPage from './pages/Orders/Orders';
+import OrderDetailPage from './pages/Orders/OrderDetail';
 import CartPage from './pages/Cart/Cart';
 import CheckoutPage from './pages/Checkout/Checkout';
 import AddressesPage from './pages/Checkout/AddressesPage';
@@ -83,6 +85,8 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route element={<RequireAuth />}>
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/orders/:id" element={<OrderDetailPage />} />
           <Route path="/addresses" element={<AddressesPage />} />
         </Route>
       </Routes>

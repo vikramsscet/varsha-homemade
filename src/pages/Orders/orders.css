@@ -1,0 +1,32 @@
+.orders-page { max-width: 820px; padding: 140px 16px 80px; }
+.orders-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.orders-head h1 { margin: 0; font: 600 30px/1.2 var(--serif); color: var(--maroon); }
+.orders-filter { display: flex; flex-direction: column; gap: 4px; font: 600 13px var(--sans); color: var(--deep); }
+.orders-filter select { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: 15px var(--sans); background: #fff; color: var(--deep); }
+.orders-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.order-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; display: grid; gap: 12px; }
+.order-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.order-number { color: var(--maroon); font-size: 17px; overflow-wrap: anywhere; }
+.order-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--cream); color: var(--deep); }
+.order-badge.status-paid { background: #e6f4ea; color: #1e6b34; }
+.order-badge.status-payment_failed, .order-badge.status-cancelled, .order-badge.status-expired { background: #fdecea; color: #7a1410; }
+.order-badge.status-pending_payment, .order-badge.status-partially_refunded, .order-badge.status-refunded { background: #fff4e0; color: #7a4a00; }
+.order-meta { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
+.order-meta dt { color: var(--muted); font-size: 13px; }
+.order-meta dd { margin: 0; font-weight: 600; color: var(--deep); overflow-wrap: anywhere; }
+.order-card .btn { justify-self: start; }
+.orders-empty, .orders-error { text-align: center; padding: 48px 0; }
+.orders-loading { color: var(--muted); }
+.orders-more { text-align: center; margin-top: 20px; }
+@media (max-width: 800px) { .orders-page { padding-top: 110px; } .order-card .btn { justify-self: stretch; } }
+
+.order-detail { display: grid; gap: 16px; }
+.order-detail h2 { margin: 0 0 12px; font: 600 20px/1.2 var(--serif); color: var(--maroon); }
+.order-back { color: var(--maroon); font-weight: 600; text-decoration: none; }
+.od-items, .od-payments { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
+.od-item { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.od-item:first-child { border-top: 0; }
+.od-item > div { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.od-item span { font-size: 13px; color: var(--muted); }
+.od-address { display: flex; flex-direction: column; gap: 2px; font-style: normal; color: var(--deep); }
+.od-payment { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; }

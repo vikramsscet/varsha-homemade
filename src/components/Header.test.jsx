@@ -132,7 +132,7 @@ describe('header with cart errors or no cart', () => {
     expect(badges(r)).toHaveLength(0);
     click(host(r, byClass('account-trigger')));
     const items = hosts(r, (p) => p.role === 'menuitem');
-    expect(items.map(text)).toEqual(['Profile', 'Sign Out']);
+    expect(items.map(text)).toEqual(['Profile', 'My Orders', 'Sign Out']);
   });
 });
 
@@ -157,7 +157,7 @@ describe('existing header behavior', () => {
     signedIn();
     const { r } = render();
     click(host(r, byClass('account-trigger')));
-    const [profile, signOut] = hosts(r, (p) => p.role === 'menuitem');
+    const [profile, , signOut] = hosts(r, (p) => p.role === 'menuitem');
     expect(profile.props.href).toBe('/profile');
     click(signOut);
     expect(auth.logout).toHaveBeenCalledTimes(1);
