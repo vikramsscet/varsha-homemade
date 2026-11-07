@@ -9,6 +9,8 @@ import { clearPaymentRef, getPaymentRef, updatePaymentRef } from '../../services
 import { clearGuestOrderToken } from '../../services/guestOrderStorage';
 import { tokenStorage } from '../../services/tokenStorage';
 import { initialPaymentState, paymentReducer, restoreState } from '../../context/paymentReducer';
+import { getTheme } from '../../themes/themeConfig';
+import { loadThemeId } from '../../themes/themeStorage';
 
 const customerType = () => (tokenStorage.get() ? 'USER' : 'GUEST');
 // Order-creation failures after which the order can never be paid: stop recovering it.
@@ -73,7 +75,7 @@ export function usePayment() {
           name: 'Varsha Homemade',
           description: `Order ${orderNumber}`,
           prefill,
-          theme: { color: '#7a1f2b' },
+          theme: { color: getTheme(loadThemeId()).colors.primary.toLowerCase() }, // Classic Indian: #7a1f2b
           handler: async (response) => {
             dispatch({ type: 'STATUS', status: S.VERIFYING_PAYMENT });
             const body = {

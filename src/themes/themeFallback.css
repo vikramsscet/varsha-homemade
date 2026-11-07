@@ -1,0 +1,43 @@
+/*
+ * Pre-JS fallback: the Classic Indian theme, so the first paint is correct before ThemeProvider
+ * writes the active theme onto <html> (inline styles there override this block).
+ * Must mirror src/themes/themes/classicIndian.js; themeFallback.test.js fails on drift.
+ */
+:root {
+  --color-primary: #7A1F2B;
+  --color-primary-hover: #3D2B1F;
+  --color-secondary: #C9A227;
+  --color-accent: #C9A227;
+  --color-background: #FFF8F0;
+  --color-background-alt: #F7ECDF;
+  --color-surface: #FFFFFF;
+  --color-on-primary: #FFFFFF;
+  --color-text: #3D2B1F;
+  --color-muted: #806E60;
+  --color-border: #EADFD3;
+  --color-success: #1E6B34;
+  --color-warning: #B26A00;
+  --color-error: #B3261E;
+  --color-secondary-light: #F0C75A;
+  --color-on-dark: #F4E8DC;
+  --color-on-dark-muted: #BBA99B;
+  --color-success-background: #E6F4EA;
+  --color-warning-background: #FFF4E0;
+  --color-error-background: #FDECEA;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --radius-card: 5px;
+  --radius-panel: 16px;
+  --radius-action: 999px;
+  --radius-button: 4px;
+  --radius-input: 2px;
+  --spacing-default: 16px;
+  --shadow-sm: 0 5px 18px rgba(61, 43, 31, 0.094);
+  --shadow-md: 0 8px 28px rgba(61, 43, 31, 0.043);
+  --shadow-lg: 0 14px 30px rgba(61, 43, 31, 0.125);
+  --shadow-card: 0 8px 28px rgba(61, 43, 31, 0.043);
+}

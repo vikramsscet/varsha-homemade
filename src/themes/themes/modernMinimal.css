@@ -1,0 +1,90 @@
+/*
+ * Modern Minimal: structural refinements beyond the token palette (quieter surfaces, image-led
+ * product cards, no decorative motion). Scoped to the data-theme attribute that ThemeProvider
+ * already sets, so Classic Indian and Festive & Vibrant are untouched. Colors, radii and fonts
+ * still come from the theme tokens.
+ */
+
+/* Typography: lighter, tighter headings; no synthesized italics (DM Sans italics are not loaded). */
+:root[data-theme='modern-minimal'] h1, :root[data-theme='modern-minimal'] h2, :root[data-theme='modern-minimal'] h3 { font-weight: 500; letter-spacing: -.02em }
+:root[data-theme='modern-minimal'] .hero h1 { font-weight: 500; line-height: 1.1 }
+:root[data-theme='modern-minimal'] .hero h1 i, :root[data-theme='modern-minimal'] h2 i { font-style: normal; font-weight: inherit; color: var(--color-accent) }
+:root[data-theme='modern-minimal'] .eyebrow { letter-spacing: .16em; color: var(--color-primary) }
+:root[data-theme='modern-minimal'] .image-caption i, :root[data-theme='modern-minimal'] .festival-copy h2 i { font-style: normal }
+:root[data-theme='modern-minimal'] .image-caption i { color: var(--color-primary) }
+
+/* Calm motion: fade only, no lifts or zooms. */
+:root[data-theme='modern-minimal'] .reveal { transform: none; transition: opacity .35s }
+:root[data-theme='modern-minimal'] .button:hover, :root[data-theme='modern-minimal'] .product-card:hover, :root[data-theme='modern-minimal'] .product-list-card:hover,
+:root[data-theme='modern-minimal'] .cart-link:hover, :root[data-theme='modern-minimal'] .account-trigger:hover { transform: none }
+:root[data-theme='modern-minimal'] .product-card:hover .product-image img, :root[data-theme='modern-minimal'] .gallery-item:hover img { transform: none }
+
+/* Focus ring needs 3:1 against the light page; sage is too faint, so use the primary. */
+:root[data-theme='modern-minimal'] :focus-visible { outline-color: var(--color-primary) }
+:root[data-theme='modern-minimal'] .nav-links>a:not(.button):hover, :root[data-theme='modern-minimal'] .cart-link:hover { color: var(--color-primary) }
+
+/* Buttons: confident but flat. */
+:root[data-theme='modern-minimal'] .button { font-size: 13px; letter-spacing: .02em; padding: 14px 24px }
+:root[data-theme='modern-minimal'] .button-outline { border-width: 1.5px }
+
+/* Hero: open and light, a soft rounded image instead of the arch + offset block. */
+:root[data-theme='modern-minimal'] .hero { background: var(--color-background) }
+:root[data-theme='modern-minimal'] .hero-pattern { display: none }
+:root[data-theme='modern-minimal'] .hero-image { border-radius: 24px; box-shadow: none }
+:root[data-theme='modern-minimal'] .hero-note, :root[data-theme='modern-minimal'] .festival-card { border-radius: var(--radius-md); box-shadow: var(--shadow-lg) }
+:root[data-theme='modern-minimal'] .hero-details div+div { border-left-color: var(--color-border) }
+
+/* Trust bar: a quiet ruled strip rather than a solid brand band. */
+:root[data-theme='modern-minimal'] .trust-bar { background: var(--color-surface); color: var(--color-muted); border-block: 1px solid var(--color-border) }
+:root[data-theme='modern-minimal'] .trust-bar i { color: var(--color-accent) }
+
+/* About */
+:root[data-theme='modern-minimal'] .about-image img { border-radius: 20px }
+:root[data-theme='modern-minimal'] .image-caption { background: var(--color-surface); color: var(--color-text); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); font-weight: 500 }
+
+/* Product cards (home): image-led, hairline border, no shadow until hover. */
+:root[data-theme='modern-minimal'] .product-card { padding: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-panel); box-shadow: none; transition: box-shadow .2s, border-color .2s }
+:root[data-theme='modern-minimal'] .product-card:hover { box-shadow: var(--shadow-md); border-color: color-mix(in srgb, var(--color-border) 60%, var(--color-text)) }
+:root[data-theme='modern-minimal'] .product-image { height: auto; aspect-ratio: 4 / 5; border-radius: 0; background: var(--color-background-alt) }
+:root[data-theme='modern-minimal'] .product-image span { border-radius: 999px; padding: 4px 10px; letter-spacing: .08em }
+:root[data-theme='modern-minimal'] .product-card h3 { font: 500 20px/1.3 var(--font-heading); margin: 20px 20px 6px }
+:root[data-theme='modern-minimal'] .product-card p { font-size: 13px; margin: 0 20px 14px }
+:root[data-theme='modern-minimal'] .product-card a { display: inline-block; margin: 0 20px 22px; font-size: 12px }
+
+/* Product cards (listing) */
+:root[data-theme='modern-minimal'] .product-list-card { padding: 0; overflow: hidden; border-radius: var(--radius-panel); box-shadow: none; transition: box-shadow .2s, border-color .2s }
+:root[data-theme='modern-minimal'] .product-list-card:hover { box-shadow: var(--shadow-md) }
+:root[data-theme='modern-minimal'] .product-list-image-wrap { height: auto; aspect-ratio: 4 / 5; border-radius: 0 }
+:root[data-theme='modern-minimal'] .product-list-info { padding: 18px 20px 22px }
+:root[data-theme='modern-minimal'] .product-list-info h3 { font-size: 18px; letter-spacing: -.01em }
+:root[data-theme='modern-minimal'] .product-price-row strong { font-family: var(--font-body); font-weight: 600 }
+
+/* Gallery, reviews, FAQ */
+:root[data-theme='modern-minimal'] .gallery-item { border-radius: var(--radius-md) }
+:root[data-theme='modern-minimal'] .review-grid blockquote { border: 1px solid var(--color-border); border-radius: var(--radius-panel) }
+:root[data-theme='modern-minimal'] .review-grid blockquote>p { font-weight: 400 }
+:root[data-theme='modern-minimal'] .review-grid footer { background: transparent; color: inherit }
+:root[data-theme='modern-minimal'] .rating, :root[data-theme='modern-minimal'] .review-grid blockquote>div, :root[data-theme='modern-minimal'] summary span { color: var(--color-accent) }
+:root[data-theme='modern-minimal'] .contact-form { border-radius: var(--radius-panel) }
+
+/* Account pages: quiet panels, neutral titles (terracotta reserved for actions and highlights). */
+:root[data-theme='modern-minimal'] .cart-page h1, :root[data-theme='modern-minimal'] .checkout-page h1, :root[data-theme='modern-minimal'] .orders-head h1, :root[data-theme='modern-minimal'] .profile-identity h1, :root[data-theme='modern-minimal'] .login-card h1,
+:root[data-theme='modern-minimal'] .cart-summary h2, :root[data-theme='modern-minimal'] .checkout-form h2, :root[data-theme='modern-minimal'] .summary-head h2, :root[data-theme='modern-minimal'] .profile-card h2, :root[data-theme='modern-minimal'] .order-detail h2, :root[data-theme='modern-minimal'] .dialog h3 { color: var(--color-text) }
+:root[data-theme='modern-minimal'] .cart-card, :root[data-theme='modern-minimal'] .checkout-main, :root[data-theme='modern-minimal'] .checkout-summary, :root[data-theme='modern-minimal'] .profile-card, :root[data-theme='modern-minimal'] .order-card, :root[data-theme='modern-minimal'] .login-card { box-shadow: none }
+:root[data-theme='modern-minimal'] .product-detail-shell, :root[data-theme='modern-minimal'] .category-page-shell { background: var(--color-background) }
+:root[data-theme='modern-minimal'] .add-to-cart:disabled { opacity: 1; background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)); color: var(--color-primary-hover); cursor: default }
+:root[data-theme='modern-minimal'] .main-image-wrap img { border-radius: var(--radius-panel) }
+:root[data-theme='modern-minimal'] .product-image-gallery .thumb { border-radius: var(--radius-sm) }
+
+@media (min-width: 901px) {
+  :root[data-theme='modern-minimal'] .section { padding: 136px 0 }
+}
+
+@media (max-width: 650px) {
+  :root[data-theme='modern-minimal'] .hero-image { border-radius: 18px }
+  :root[data-theme='modern-minimal'] .product-card h3 { font-size: 16px; margin: 14px 14px 4px }
+  :root[data-theme='modern-minimal'] .product-card p { margin: 0 14px 10px; font-size: 12px }
+  :root[data-theme='modern-minimal'] .product-card a { margin: 0 14px 16px }
+  :root[data-theme='modern-minimal'] .product-list-image-wrap { aspect-ratio: 1 / 1 }
+  :root[data-theme='modern-minimal'] .product-list-info { padding: 14px 14px 18px }
+}

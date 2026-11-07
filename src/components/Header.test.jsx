@@ -10,6 +10,9 @@ const auth = { status: 'unauthenticated', user: null, logout: vi.fn() };
 const cartState = { cart: null, itemCount: 0, status: 'idle', error: null };
 vi.mock('../context/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('../context/CartContext', () => ({ useCart: () => cartState }));
+vi.mock('../context/ThemeContext', () => ({
+  useTheme: () => ({ currentTheme: { id: 'classic-indian' }, availableThemes: [], setTheme: () => {} }),
+}));
 
 const navLinks = [{ label: 'About', href: '#about' }, { label: 'Contact', href: '#contact' }];
 let location;

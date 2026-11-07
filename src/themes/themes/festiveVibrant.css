@@ -1,0 +1,75 @@
+/*
+ * Festive & Vibrant: structural refinements beyond the token palette (a red-and-gold promotional
+ * panel, gold reserved for highlights). Scoped to the data-theme attribute ThemeProvider already
+ * sets, so the other themes are untouched. Gold (#F2A900) is only ever a fill or a rule behind dark
+ * text: as text on cream it is 1.9:1, so text uses the red, the brown, or a deepened gold.
+ */
+
+/* Typography: the serif carries the celebration; slightly heavier headings. */
+:root[data-theme='festive-vibrant'] h1, :root[data-theme='festive-vibrant'] h2, :root[data-theme='festive-vibrant'] h3 { font-weight: 700 }
+/* The global h2 tracking is tuned for the 48-68px marketing headings; reset it for app headings. */
+:root[data-theme='festive-vibrant'] .checkout-page h1, :root[data-theme='festive-vibrant'] .checkout-form h2, :root[data-theme='festive-vibrant'] .summary-head h2, :root[data-theme='festive-vibrant'] .cart-page h1, :root[data-theme='festive-vibrant'] .cart-summary h2,
+:root[data-theme='festive-vibrant'] .orders-head h1, :root[data-theme='festive-vibrant'] .profile-identity h1, :root[data-theme='festive-vibrant'] .profile-card h2, :root[data-theme='festive-vibrant'] .order-detail h2, :root[data-theme='festive-vibrant'] .login-card h1, :root[data-theme='festive-vibrant'] .dialog h3 { letter-spacing: 0 }
+:root[data-theme='festive-vibrant'] .eyebrow { color: var(--color-primary); letter-spacing: .14em }
+
+/* Focus ring: gold is too faint on cream, so use the red. */
+:root[data-theme='festive-vibrant'] :focus-visible { outline-color: var(--color-primary) }
+:root[data-theme='festive-vibrant'] .nav-links>a:not(.button):hover, :root[data-theme='festive-vibrant'] .cart-link:hover { color: var(--color-primary) }
+
+/* Gold used as text on light surfaces (stars, ticks, + markers) is deepened to stay legible. */
+:root[data-theme='festive-vibrant'] .rating, :root[data-theme='festive-vibrant'] .review-grid blockquote>div, :root[data-theme='festive-vibrant'] .promise-list span::first-letter, :root[data-theme='festive-vibrant'] .hero-details small,
+:root[data-theme='festive-vibrant'] .hero-note span { color: color-mix(in srgb, var(--color-secondary) 50%, var(--color-text)) }
+:root[data-theme='festive-vibrant'] summary span { color: var(--color-primary) }
+
+/* Form controls: a border that reads against cream (3:1), not a hairline. */
+:root[data-theme='festive-vibrant'] input, :root[data-theme='festive-vibrant'] textarea, :root[data-theme='festive-vibrant'] select, :root[data-theme='festive-vibrant'] .field input, :root[data-theme='festive-vibrant'] .field select {
+  border-color: color-mix(in srgb, var(--color-text) 45%, var(--color-border))
+}
+
+/* Hero: warm saffron glow behind the arch image, a gold seal as the one highlight. */
+:root[data-theme='festive-vibrant'] .hero { background: radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--color-secondary) 24%, transparent), transparent 55%), var(--color-background) }
+:root[data-theme='festive-vibrant'] .hero-image { box-shadow: 14px 14px 0 color-mix(in srgb, var(--color-secondary) 55%, var(--color-background)) }
+:root[data-theme='festive-vibrant'] .seal { background: var(--color-secondary); color: var(--color-text); border-color: var(--color-surface) }
+:root[data-theme='festive-vibrant'] .seal b { color: var(--color-text) }
+
+/* Trust bar: a gold band with dark text (6.5:1). */
+:root[data-theme='festive-vibrant'] .trust-bar { background: var(--color-secondary); color: var(--color-text) }
+:root[data-theme='festive-vibrant'] .trust-bar i { color: var(--color-primary-hover) }
+
+/* About */
+:root[data-theme='festive-vibrant'] .image-caption { border-top: 3px solid var(--color-secondary); border-radius: var(--radius-card) var(--radius-card) 0 0 }
+
+/* Featured product cards (home + listing): white, gold top rule, gold badge. */
+:root[data-theme='festive-vibrant'] .product-card, :root[data-theme='festive-vibrant'] .product-list-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-panel);
+  background: linear-gradient(var(--color-secondary), var(--color-secondary)) top / 100% 4px no-repeat, var(--color-surface) }
+:root[data-theme='festive-vibrant'] .product-card:hover { transform: translateY(-4px) }
+:root[data-theme='festive-vibrant'] .product-image, :root[data-theme='festive-vibrant'] .product-list-image-wrap { border-radius: var(--radius-md) }
+:root[data-theme='festive-vibrant'] .product-image span { background: var(--color-secondary); color: var(--color-text); border-radius: 999px; padding: 4px 10px }
+:root[data-theme='festive-vibrant'] .product-card h3, :root[data-theme='festive-vibrant'] .product-list-info h3 { font-weight: 700 }
+
+/* Celebratory promotional panel: red gradient, cream text (>=5:1), gold only on the headline accent and CTA. */
+:root[data-theme='festive-vibrant'] .festivals { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%); color: var(--color-on-dark) }
+:root[data-theme='festive-vibrant'] .festivals .eyebrow, :root[data-theme='festive-vibrant'] .festivals .light { color: var(--color-on-dark) }
+:root[data-theme='festive-vibrant'] .festival-copy h2 { color: var(--color-on-primary) }
+:root[data-theme='festive-vibrant'] .festival-copy h2 i { color: var(--color-secondary-light) }
+:root[data-theme='festive-vibrant'] .festival-copy>p:not(.eyebrow), :root[data-theme='festive-vibrant'] .festival-copy li { color: var(--color-on-dark) }
+:root[data-theme='festive-vibrant'] .festival-copy li { border-bottom-color: color-mix(in srgb, var(--color-on-dark) 28%, transparent) }
+:root[data-theme='festive-vibrant'] .festival-copy li:before { color: var(--color-secondary-light) }
+:root[data-theme='festive-vibrant'] .festival-card { border-left: 4px solid var(--color-secondary); border-radius: var(--radius-card) }
+:root[data-theme='festive-vibrant'] .button-gold { background: var(--color-secondary); border-color: var(--color-secondary); color: var(--color-text) }
+:root[data-theme='festive-vibrant'] .button-gold:hover { background: var(--color-secondary-light); border-color: var(--color-secondary-light); color: var(--color-text) }
+
+/* Gallery, reviews, footer */
+:root[data-theme='festive-vibrant'] .gallery-item { border-radius: var(--radius-md) }
+:root[data-theme='festive-vibrant'] .reviews { background: var(--color-background-alt) }
+:root[data-theme='festive-vibrant'] .review-grid blockquote { border-radius: var(--radius-panel) }
+:root[data-theme='festive-vibrant'] .review-grid footer { background: transparent; color: inherit }
+:root[data-theme='festive-vibrant'] footer { border-top: 4px solid var(--color-secondary) }
+:root[data-theme='festive-vibrant'] .review-grid footer { border-top: 0 }
+
+/* Product page: a gold Buy Now beside the red Add to cart. */
+:root[data-theme='festive-vibrant'] .buy-now { background: var(--color-secondary); color: var(--color-text); font-weight: 700 }
+:root[data-theme='festive-vibrant'] .buy-now:hover { background: var(--color-secondary-light) }
+:root[data-theme='festive-vibrant'] .add-to-cart:disabled { opacity: 1; background: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)); color: var(--color-primary-hover); cursor: default }
+:root[data-theme='festive-vibrant'] .btn { border-radius: var(--radius-action) }
+:root[data-theme='festive-vibrant'] .category-page-shell, :root[data-theme='festive-vibrant'] .product-detail-shell { background: var(--color-background) }

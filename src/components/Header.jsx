@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AccountMenu from './AccountMenu';
 import CartLink from './CartLink';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onCloseMenu }) {
   const location = useLocation();
@@ -28,6 +29,7 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
         </div>
 
         <div className="nav-actions">
+          <ThemeSwitcher />
           <CartLink onClick={onCloseMenu} />
           {status === 'authenticated' && <AccountMenu />}
         </div>

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -32,11 +33,13 @@ it('the /cart route renders the cart page inside the app shell', async () => {
   await act(async () => {
     r = TestRenderer.create(
       <MemoryRouter initialEntries={['/cart']}>
-        <AuthProvider>
-          <CartProvider>
-            <App />
-          </CartProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <App />
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </MemoryRouter>
     );
   });

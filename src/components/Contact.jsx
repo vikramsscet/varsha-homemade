@@ -38,7 +38,7 @@ export default function Contact() {
           referrerPolicy="no-referrer-when-downgrade"
           style={{ width: '100%', height: '250px', border: 0, display: 'block', filter: 'saturate(.6) sepia(.1)' }}
         ></iframe>
-        <span style={{ position: 'absolute', right: 0, bottom: 0, background: '#3d2b1f', padding: '6px 10px', fontSize: '9px', color: '#dccabc' }}>
+        <span style={{ position: 'absolute', right: 0, bottom: 0, background: 'var(--color-text)', padding: '6px 10px', fontSize: '9px', color: 'var(--color-on-dark-muted)' }}>
           Update this map with your exact business location before publishing.
         </span>
       </div>

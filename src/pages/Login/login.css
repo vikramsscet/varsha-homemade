@@ -1,5 +1,5 @@
 .login-page { display: flex; justify-content: center; padding: 140px 0 80px; }
-.login-card { width: 100%; max-width: 420px; padding: 36px 28px; text-align: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; }
+.login-card { width: 100%; max-width: 420px; padding: 36px 28px; text-align: center; background: var(--color-surface); border: 1px solid var(--line); border-radius: var(--radius-panel); }
 .login-card h1 { margin: 0 0 8px; font: 600 30px/1.2 var(--serif); color: var(--maroon); }
 .login-card p { margin: 0 0 20px; color: var(--muted); }
 .google-signin { display: flex; justify-content: center; min-height: 44px; }

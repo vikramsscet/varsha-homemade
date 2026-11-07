@@ -1,0 +1,41 @@
+import { createTheme } from './createTheme';
+
+export default createTheme({
+  id: 'festive-vibrant',
+  label: 'Festive & Vibrant',
+  description: 'Bold red and marigold for celebrations.',
+  colors: {
+    primary: '#B83227',
+    primaryHover: '#9A261D',
+    secondary: '#F2A900',
+    accent: '#E8590C',
+    background: '#FFF9EC',
+    backgroundAlt: '#FCEFCF',
+    surface: '#FFFFFF',
+    onPrimary: '#FFFFFF',
+    text: '#422B20',
+    mutedText: '#7A5F50',
+    border: '#F1E0BE',
+    success: '#25692A',
+    warning: '#C77700',
+    error: '#C62828',
+    secondaryLight: '#FFD35C',
+    onDark: '#FFF1D6',
+    onDarkMuted: '#E3C9A0',
+    successBackground: '#E3F2E4',
+    warningBackground: '#FFF1D1',
+    errorBackground: '#FDE8E6',
+  },
+  design: {
+    cardRadius: '20px',
+    panelRadius: '24px',
+    actionButtonRadius: '999px',
+    buttonRadius: '999px',
+    inputRadius: '12px',
+    shadows: {
+      sm: '0 3px 12px rgba(184, 50, 39, 0.14)',
+      md: '0 8px 24px rgba(184, 50, 39, 0.16)',
+      lg: '0 16px 36px rgba(184, 50, 39, 0.2)',
+    },
+  },
+});
