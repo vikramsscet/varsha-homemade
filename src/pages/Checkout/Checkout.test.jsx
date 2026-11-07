@@ -292,3 +292,38 @@ describe('empty cart', () => {
     expect(guestCtx.create).not.toHaveBeenCalled();
   });
 });
+
+describe('payment section (phase 1)', () => {
+  const pay = () => btnText('Pay Now');
+
+  it('shows Razorpay info and a disabled Pay Now for an empty guest form', async () => {
+    setup();
+    await render();
+    expect(allText()).toContain('Razorpay');
+    expect(allText()).toContain('UPI');
+    expect(pay().props.disabled).toBe(true);
+  });
+
+  it('enables Pay Now for a guest session with complete saved details', async () => {
+    const session = {
+      id: 's1',
+      customer: { email: 'a@b.co', firstName: 'V', lastName: 'R', phone: '+918319510666' },
+      deliveryAddress: { country: 'IN', countryName: 'India', addressLine1: 'x', city: 'Pune', state: 'MH', postalCode: '411057' },
+    };
+    setup({ session });
+    await render();
+    expect(pay().props.disabled).toBe(false);
+  });
+
+  it('enables Pay Now for an authenticated user with a default address', async () => {
+    setup({ authed: true, addresses: [addr('a1', { isDefault: true })] });
+    await render();
+    expect(pay().props.disabled).toBe(false);
+  });
+
+  it('disables Pay Now for an authenticated user without an address', async () => {
+    setup({ authed: true, addresses: [] });
+    await render();
+    expect(pay().props.disabled).toBe(true);
+  });
+});

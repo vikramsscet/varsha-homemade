@@ -4,7 +4,9 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import GuestCheckout from './GuestCheckout';
 import AuthCheckout from './AuthCheckout';
+import PaymentResult from './PaymentResult';
 import OrderSummary from './OrderSummary';
+import { usePayment } from './usePayment';
 import { useGuestTransition } from './useGuestTransition';
 import './checkout.css';
 
@@ -12,12 +14,16 @@ export default function CheckoutPage() {
   const { status: authStatus } = useAuth();
   const { status: cartStatus, items } = useCart();
   const { guestAddress, dismissGuestAddress } = useGuestTransition();
+  const { payment, pay } = usePayment();
   const authed = authStatus === 'authenticated';
   const crumbs = [{ label: 'Home', to: '/' }, { label: 'Cart', to: '/cart' }, { label: 'Checkout' }];
 
   const loading = authStatus === 'loading' || cartStatus === 'loading' || (authed && cartStatus === 'idle');
   let body;
-  if (loading) {
+  if (payment.status === 'PAYMENT_SUCCESS') {
+    // Backend-confirmed payment: the refreshed (empty) cart must not replace this view.
+    body = <PaymentResult payment={payment} />;
+  } else if (loading) {
     body = <p role="status" className="checkout-loading">Loading checkout…</p>;
   } else if (items.length === 0) {
     body = (
@@ -31,7 +37,7 @@ export default function CheckoutPage() {
     body = (
       <div className="checkout-layout">
         <div className="checkout-main">
-          {authed ? <AuthCheckout guestAddress={guestAddress} onGuestAddressDone={dismissGuestAddress} /> : <GuestCheckout />}
+          {authed ? <AuthCheckout onPayNow={pay} payment={payment} guestAddress={guestAddress} onGuestAddressDone={dismissGuestAddress} /> : <GuestCheckout onPayNow={pay} payment={payment} />}
         </div>
         <OrderSummary />
       </div>

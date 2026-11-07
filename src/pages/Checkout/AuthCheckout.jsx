@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AddressBook from '../../components/AddressBook/AddressBook';
 import { useAuth } from '../../context/AuthContext';
 import { useAddresses } from '../../context/AddressContext';
+import PaymentSection from './PaymentSection';
 import { getAddressErrorMessage } from '../../services/checkoutErrors';
 
 // Offered only after login, only with explicit consent: never saved automatically.
@@ -38,7 +39,7 @@ function SaveGuestAddress({ candidate, onDone }) {
 
 // Signed-in checkout: contact from the account, delivery from the saved address book. The
 // default is found by isDefault === true (never by list position) and a user's later choice wins.
-export default function AuthCheckout({ guestAddress, onGuestAddressDone }) {
+export default function AuthCheckout({ guestAddress, onGuestAddressDone, onPayNow, payment }) {
   const { user } = useAuth();
   const { addresses, refresh } = useAddresses();
   const [loaded, setLoaded] = useState(false);
@@ -80,6 +81,8 @@ export default function AuthCheckout({ guestAddress, onGuestAddressDone }) {
           <AddressBook selectable emptyAsForm selectedId={effective?.id ?? null} onSelect={setSelectedId} />
         )}
       </section>
+
+      <PaymentSection ready={!!(user?.email && effective)} busy={!loaded} onPayNow={() => onPayNow({ addressId: effective.id, prefill: { name: user?.displayName, email: user?.email, contact: user?.phone } })} payment={payment} />
     </div>
   );
 }

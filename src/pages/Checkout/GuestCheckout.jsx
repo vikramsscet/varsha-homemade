@@ -4,6 +4,7 @@ import Field from '../../components/Field/Field';
 import CountrySelect from '../../components/Field/CountrySelect';
 import { useGuestCheckout } from '../../context/GuestCheckoutContext';
 import { DEAD_SESSION_CODES } from '../../services/guestCheckoutApi';
+import PaymentSection from './PaymentSection';
 import { getGuestSession } from '../../services/guestCheckoutStorage';
 import { getFieldErrors } from '../../services/apiErrors';
 import { getGuestCheckoutErrorMessage, SESSION_EXPIRED_MESSAGE } from '../../services/checkoutErrors';
@@ -38,7 +39,7 @@ function changed(values, saved, fields) {
   return out;
 }
 
-export default function GuestCheckout() {
+export default function GuestCheckout({ onPayNow, payment }) {
   const guest = useGuestCheckout();
   const guestRef = useRef(guest);
   guestRef.current = guest;
@@ -126,6 +127,11 @@ export default function GuestCheckout() {
     }
   }
 
+  // Ready only when the *saved* session holds valid details (what the backend will see).
+  const sc = guest.session?.customer, sd = guest.session?.deliveryAddress;
+  const ready = !!guest.session && !guest.expired
+    && Object.keys(validateCustomer(sc ?? {})).length === 0
+    && Object.keys(validateDelivery({ ...(sd ?? {}), country: sd?.countryName ?? sd?.country })).length === 0;
   const expired = guest.expired || expiredNotice;
   return (
     <form className="checkout-form" onSubmit={handleSubmit} noValidate aria-busy={saving || initializing}>
@@ -167,6 +173,8 @@ export default function GuestCheckout() {
           {saving ? 'Saving…' : 'Save details'}
         </button>
       </div>
+
+      <PaymentSection ready={ready} busy={saving || initializing} onPayNow={() => onPayNow({ prefill: { name: [sc?.firstName, sc?.lastName].filter(Boolean).join(' '), email: sc?.email, contact: sc?.phone } })} payment={payment} />
     </form>
   );
 }

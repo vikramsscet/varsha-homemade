@@ -1,0 +1,136 @@
+import React from 'react';
+import TestRenderer, { act } from 'react-test-renderer';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { usePayment } from './usePayment';
+import * as api from '../../services/paymentApi';
+import { loadRazorpay } from '../../services/razorpayLoader';
+import { ApiError } from '../../services/apiClient';
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+vi.mock('../../services/paymentApi');
+vi.mock('../../services/razorpayLoader');
+const refreshCart = vi.fn();
+vi.mock('../../context/CartContext', () => ({
+  useCart: () => ({ items: [{ id: 'i1' }], subtotal: 1, discountAmount: 0, taxAmount: 0, totalAmount: 1, currency: 'INR', cart: {}, refreshCart }),
+}));
+
+const order = { id: 'o1', orderNumber: 'VH1', amountInPaise: 100 };
+const pmt = { paymentId: 'p1', razorpayOrderId: 'order_1', razorpayKeyId: 'rzp_test_x', amount: 109750, currency: 'INR', attemptNumber: 1, status: 'CREATED' };
+let opts, hook;
+class FakeRazorpay { constructor(o) { opts = o; } open() {} }
+
+async function mount() {
+  function C() { hook = usePayment(); return null; }
+  await act(async () => { TestRenderer.create(<C />); });
+}
+const start = (arg = { addressId: 'ad1' }) => { let p; act(() => { p = hook.pay(arg); }); return p; };
+const flush = () => act(async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); });
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  refreshCart.mockResolvedValue({});
+  api.createOrder.mockResolvedValue(order);
+  api.createRazorpayOrder.mockResolvedValue(pmt);
+  api.verifyPayment.mockResolvedValue({ paid: true, paymentStatus: 'CAPTURED', orderNumber: 'VH1', amount: 109750 });
+  loadRazorpay.mockResolvedValue(FakeRazorpay);
+});
+
+describe('usePayment', () => {
+  it('creates the order first, then opens Checkout with the backend amount', async () => {
+    await mount();
+    start(); await flush(); await flush();
+    expect(api.createOrder.mock.invocationCallOrder[0]).toBeLessThan(api.createRazorpayOrder.mock.invocationCallOrder[0]);
+    expect(opts).toMatchObject({ key: 'rzp_test_x', order_id: 'order_1', amount: 109750, currency: 'INR', name: 'Varsha Homemade' });
+    expect(opts.description).toContain('VH1');
+    expect(hook.payment.status).toBe('PAYMENT_IN_PROGRESS');
+  });
+
+  it('verifies via the backend and only then reports success', async () => {
+    await mount();
+    start(); await flush(); await flush();
+    await act(async () => { await opts.handler({ razorpay_order_id: 'order_1', razorpay_payment_id: 'pay_1', razorpay_signature: 'sig' }); });
+    expect(api.verifyPayment).toHaveBeenCalledWith(expect.objectContaining({ internalPaymentId: 'p1', razorpay_signature: 'sig' }));
+    expect(hook.payment.status).toBe('PAYMENT_SUCCESS');
+    expect(refreshCart).toHaveBeenCalledTimes(1);
+  });
+
+  const verifyWith = async (setup) => {
+    setup();
+    await mount();
+    start(); await flush(); await flush();
+    await act(async () => { await opts.handler({ razorpay_order_id: 'order_1', razorpay_payment_id: 'pay_1', razorpay_signature: 's' }); });
+    return hook.payment;
+  };
+  const err = (status, code) => new ApiError({ status, code });
+
+  it('202 authorized-not-captured shows confirming, not success, and keeps the cart', async () => {
+    const p = await verifyWith(() => api.verifyPayment.mockResolvedValue({ paid: false, paymentStatus: 'AUTHORIZED', orderStatus: 'PENDING_PAYMENT' }));
+    expect(p.status).toBe('PAYMENT_CONFIRMING');
+    expect(refreshCart).not.toHaveBeenCalled();
+    start(); await flush();
+    expect(api.createRazorpayOrder).toHaveBeenCalledTimes(1); // no second payment while confirming
+  });
+
+  it('402 PAYMENT_FAILED is retryable on the same order and keeps the cart', async () => {
+    const p = await verifyWith(() => api.verifyPayment.mockRejectedValue(err(402, 'PAYMENT_FAILED')));
+    expect(p.status).toBe('PAYMENT_FAILED');
+    expect(p.outcome.retryable).toBe(true);
+    expect(refreshCart).not.toHaveBeenCalled();
+    await act(async () => { hook.retry(); }); await flush(); await flush();
+    expect(api.createOrder).toHaveBeenCalledTimes(1);
+    expect(api.createRazorpayOrder).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['INVALID_SIGNATURE', 'RAZORPAY_ORDER_MISMATCH', 'PAYMENT_MISMATCH', 'PAYMENT_NOT_FOUND', 'PAYMENT_CONFLICT'])('%s is a non-retryable failure, never success', async (code) => {
+    const p = await verifyWith(() => api.verifyPayment.mockRejectedValue(err(400, code)));
+    expect(p.status).toBe('PAYMENT_FAILED');
+    expect(p.outcome.retryable).toBe(false);
+    expect(refreshCart).not.toHaveBeenCalled();
+  });
+
+  it.each(['PAYMENT_GATEWAY_UNAVAILABLE', 'PAYMENT_GATEWAY_ERROR', 'PAYMENT_NOT_VERIFIABLE'])('%s keeps confirming (temporary)', async (code) => {
+    const p = await verifyWith(() => api.verifyPayment.mockRejectedValue(err(502, code)));
+    expect(p.status).toBe('PAYMENT_CONFIRMING');
+  });
+
+  it('PAYMENT_REFUNDED shows a refunded outcome', async () => {
+    const p = await verifyWith(() => api.verifyPayment.mockRejectedValue(err(409, 'PAYMENT_REFUNDED')));
+    expect(p.outcome.kind).toBe('refunded');
+  });
+
+  it.each(['PAYMENT_ALREADY_PROCESSED', 'ORDER_ALREADY_PAID'])('%s re-checks the status and shows success when paid', async (code) => {
+    const p = await verifyWith(() => api.verifyPayment.mockRejectedValueOnce(err(409, code)).mockResolvedValueOnce({ paid: true, alreadyProcessed: true, orderNumber: 'VH1' }));
+    expect(api.verifyPayment).toHaveBeenCalledTimes(2);
+    expect(p.status).toBe('PAYMENT_SUCCESS');
+  });
+
+  it('a duplicate callback does not verify twice or restart payment once successful', async () => {
+    await verifyWith(() => {});
+    start(); await flush();
+    expect(api.createRazorpayOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it('dismissal keeps the order and does not create another on retry', async () => {
+    await mount();
+    start(); await flush(); await flush();
+    act(() => opts.modal.ondismiss()); await flush();
+    expect(hook.payment.status).toBe('IDLE');
+    expect(hook.payment.dismissed).toBe(true);
+    expect(refreshCart).not.toHaveBeenCalled();
+    expect(hook.payment.orderId).toBe('o1');
+    start(); await flush(); await flush();
+    expect(api.createOrder).toHaveBeenCalledTimes(1);
+    expect(api.createRazorpayOrder).toHaveBeenCalledTimes(2);
+  });
+
+  it('reuses the idempotency key after a network failure only', async () => {
+    api.createOrder.mockRejectedValueOnce(new ApiError({})).mockRejectedValueOnce(new ApiError({ status: 409, code: 'CART_CHANGED' })).mockResolvedValue(order);
+    await mount();
+    start(); await flush(); await flush();
+    start(); await flush(); await flush();
+    start(); await flush(); await flush();
+    const keys = api.createOrder.mock.calls.map((c) => c[0].idempotencyKey);
+    expect(keys[0]).toBe(keys[1]);
+    expect(keys[2]).not.toBe(keys[1]);
+  });
+});
