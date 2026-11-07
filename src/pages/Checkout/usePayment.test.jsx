@@ -13,6 +13,8 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 vi.mock('../../services/paymentApi');
 vi.mock('../../services/razorpayLoader');
 const refreshCart = vi.fn();
+const cleanup = vi.fn();
+vi.mock('../../context/GuestCheckoutContext', () => ({ useGuestCheckout: () => ({ cleanup }) }));
 vi.mock('../../context/CartContext', () => ({
   useCart: () => ({ items: [{ id: 'i1' }], subtotal: 1, discountAmount: 0, taxAmount: 0, totalAmount: 1, currency: 'INR', cart: {}, refreshCart }),
 }));
@@ -38,9 +40,10 @@ beforeEach(() => {
   tokenStorage.clear();
   clearGuestOrderToken();
   refreshCart.mockResolvedValue({});
+  cleanup.mockResolvedValue(undefined);
   api.createOrder.mockResolvedValue(order);
   api.createRazorpayOrder.mockResolvedValue(pmt);
-  api.verifyPayment.mockResolvedValue({ paid: true, paymentStatus: 'CAPTURED', orderNumber: 'VH1', amount: 109750 });
+  api.verifyPayment.mockResolvedValue({ paid: true, orderStatus: 'PAID', paymentStatus: 'CAPTURED', orderNumber: 'VH1', amount: 109750 });
   loadRazorpay.mockResolvedValue(FakeRazorpay);
 });
 
@@ -232,5 +235,34 @@ describe('usePayment', () => {
     const dump = JSON.stringify(sess.d) + JSON.stringify(window.localStorage.d);
     expect(dump).not.toContain('SIGSECRET');
     expect(dump).not.toMatch(/secret/i);
+  });
+
+  it('guest: deletes the checkout session only after a PAID success', async () => {
+    await verifyWith(() => {});
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(hook.payment.status).toBe('PAYMENT_SUCCESS');
+  });
+
+  it('guest: no cleanup for pending, failed or dismissed payments', async () => {
+    await verifyWith(() => api.verifyPayment.mockResolvedValue({ paid: false, paymentStatus: 'AUTHORIZED' }));
+    expect(cleanup).not.toHaveBeenCalled();
+  });
+
+  it('guest: no cleanup when paid but order is not PAID', async () => {
+    await verifyWith(() => api.verifyPayment.mockResolvedValue({ paid: true, orderStatus: 'PENDING_PAYMENT' }));
+    expect(cleanup).not.toHaveBeenCalled();
+  });
+
+  it('guest: a failing cleanup never turns success into failure', async () => {
+    cleanup.mockRejectedValue(new ApiError({}));
+    await verifyWith(() => {});
+    expect(hook.payment.status).toBe('PAYMENT_SUCCESS');
+  });
+
+  it('authenticated: never calls guest cleanup', async () => {
+    tokenStorage.set('jwt');
+    await verifyWith(() => {});
+    expect(cleanup).not.toHaveBeenCalled();
+    expect(hook.payment.status).toBe('PAYMENT_SUCCESS');
   });
 });

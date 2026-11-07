@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useReducer } from 'react';
 import { guestCheckoutReducer, initialGuestCheckoutState } from './guestCheckoutReducer';
 import * as guestApi from '../services/guestCheckoutApi';
+import * as guestStorage from '../services/guestCheckoutStorage';
 import { toErrorInfo } from '../services/apiErrors';
 
 const GuestCheckoutContext = createContext(null);
@@ -43,6 +44,18 @@ export function GuestCheckoutProvider({ children }) {
         }),
       updateCustomer: (customer) => run(async () => load(await guestApi.updateCustomer(customer))),
       updateDeliveryAddress: (address) => run(async () => load(await guestApi.updateDeliveryAddress(address))),
+      // Post-payment cleanup. Best effort and single attempt: never throws, never retries, and always
+      // clears the local token/state, even when the remote delete fails (expired, missing, network).
+      cleanup: async () => {
+        try {
+          if (guestStorage.getGuestSession()) await guestApi.deleteGuestSession();
+        } catch {
+          // the payment already succeeded; a failed remote delete must not surface
+        } finally {
+          guestStorage.clearGuestSession();
+          dispatch({ type: 'GUEST_SESSION_CLEARED' });
+        }
+      },
       remove: () =>
         run(async () => {
           await guestApi.deleteGuestSession();

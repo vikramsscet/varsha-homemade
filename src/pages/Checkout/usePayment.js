@@ -2,6 +2,7 @@ import { useCallback, useReducer, useRef } from 'react';
 import { createOrder, createRazorpayOrder, verifyPayment } from '../../services/paymentApi';
 import { loadRazorpay } from '../../services/razorpayLoader';
 import { toErrorInfo } from '../../services/apiErrors';
+import { useGuestCheckout } from '../../context/GuestCheckoutContext';
 import { useCart } from '../../context/CartContext';
 import { PAYMENT_STATUS as S, RECHECK_CODES, classifySuccessBody, classifyVerifyError } from '../../services/paymentResult';
 import { clearPaymentRef, getPaymentRef, updatePaymentRef } from '../../services/paymentRefStorage';
@@ -19,6 +20,7 @@ const newKey = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math
 // after /payments/verify succeeds. A dismissed modal keeps the order/payment for a later retry.
 export function usePayment() {
   const { items, subtotal, discountAmount, taxAmount, totalAmount, currency, cart, refreshCart } = useCart();
+  const guest = useGuestCheckout();
   const [state, dispatch] = useReducer(paymentReducer, initialPaymentState, () => restoreState(getPaymentRef(), customerType()));
   const ref = useRef(state);
   ref.current = state;
@@ -28,7 +30,7 @@ export function usePayment() {
   const snapshot = () => ({ items, subtotal, discountAmount, taxAmount, totalAmount, currency, shippingAmount: cart?.shippingAmount });
   const lastArgs = useRef(null);
   const cartActions = useRef({});
-  cartActions.current = { refreshCart };
+  cartActions.current = { refreshCart, cleanupGuest: guest.cleanup };
   const fail = (e) => dispatch({ type: 'ERROR', error: toErrorInfo(e) });
 
   const pay = useCallback(async ({ addressId, prefill } = {}) => {
@@ -89,6 +91,8 @@ export function usePayment() {
                 // Lifecycle complete: recovery data is no longer needed.
                 clearPaymentRef();
                 clearGuestOrderToken();
+                // Guests only (never when signed in): delete the checkout session after success is shown.
+                if (result?.orderStatus === 'PAID' && customerType() === 'GUEST') cartActions.current.cleanupGuest?.().catch?.(() => {});
                 cartActions.current.refreshCart?.().catch(() => {});
               } else updatePaymentRef({ status: 'CONFIRMING' });
             };
