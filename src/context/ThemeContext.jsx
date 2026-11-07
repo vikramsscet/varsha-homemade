@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { getTheme, getThemeOptions, isValidThemeId, resolveThemeId, themeToCssVars } from '../themes/themeConfig';
-import { THEME_STORAGE_KEY, loadThemeId, saveThemeId } from '../themes/themeStorage';
+import { THEME_STORAGE_KEY, hasStoredThemeId, loadThemeId, saveThemeId } from '../themes/themeStorage';
 
 const ThemeContext = createContext(null);
 
@@ -22,9 +22,20 @@ function applyTheme(themeId) {
 // Browser SSR/test environments may have no DOM, so fall back to a no-op layout effect.
 const useIsomorphicLayoutEffect = typeof document === 'undefined' ? useEffect : useLayoutEffect;
 
-export function ThemeProvider({ children }) {
+// `suggestion` ({ themeId, force }) is an optional campaign theme. It is NEVER persisted:
+// - without `force` it applies only while the customer has no saved choice;
+// - with `force` (a deliberate business override) it wins over a saved choice.
+// Once the campaign ends (or stops being passed) the saved choice, or Classic Indian, returns.
+function initialThemeId(suggestion) {
+  const suggested = suggestion && isValidThemeId(suggestion.themeId) ? suggestion.themeId : null;
+  if (suggested && suggestion.force === true) return suggested;
+  if (suggested && !hasStoredThemeId()) return suggested;
+  return loadThemeId();
+}
+
+export function ThemeProvider({ children, suggestion = null }) {
   // Lazy init: storage is read once, and an invalid/missing value resolves to Classic Indian.
-  const [themeId, setThemeId] = useState(loadThemeId);
+  const [themeId, setThemeId] = useState(() => initialThemeId(suggestion));
 
   // Layout effect so the variables are in place before the browser paints (no flash on load).
   useIsomorphicLayoutEffect(() => {

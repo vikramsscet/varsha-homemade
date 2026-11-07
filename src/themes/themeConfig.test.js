@@ -21,9 +21,9 @@ describe('theme registry', () => {
       for (const c of REQUIRED_COLORS) expect(t.colors[c], `${id}.colors.${c}`).toMatch(/^#[0-9A-Fa-f]{6}$/);
       expect(t.typography.headingFont).toBeTruthy();
       expect(t.typography.bodyFont).toBeTruthy();
-      expect(Object.keys(t.typography.fontWeights)).toEqual(expect.arrayContaining(['regular', 'medium', 'semibold', 'bold']));
-      for (const k of ['cardRadius', 'buttonRadius', 'inputRadius', 'panelRadius', 'actionButtonRadius', 'spacing']) expect(t.design[k], `${id}.${k}`).toBeTruthy();
-      expect(Object.keys(t.design.shadows)).toEqual(expect.arrayContaining(['sm', 'md', 'lg']));
+      expect(Object.keys(t.typography.fontWeights)).toEqual(expect.arrayContaining(['normal', 'medium', 'semibold', 'bold']));
+      for (const k of ['cardRadius', 'buttonRadius', 'inputRadius', 'panelRadius', 'actionButtonRadius', 'spacing', 'buttonStyle']) expect(t.design[k], `${id}.${k}`).toBeTruthy();
+      expect(Object.keys(t.design.shadows)).toEqual(expect.arrayContaining(['sm', 'md', 'lg', 'dropdown']));
     }
   });
 

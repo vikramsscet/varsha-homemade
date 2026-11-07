@@ -1,20 +1,22 @@
-export default function Footer({ logo }) {
+import { brandConfig } from '../branding/brandConfig';
+
+export default function Footer() {
   return (
     <footer>
       <div className="container footer-top">
-        <a className="brand header-brand" href="#home" aria-label="Varsha Homemade home">
-          <img src={logo} alt="Varsha's Homemade logo" />
+        <a className="brand header-brand" href="#home" aria-label={`${brandConfig.name} home`}>
+          <img src={brandConfig.assets.primaryLogo} alt={brandConfig.assets.logoAlt} />
         </a>
-        <p>Homemade with love · Premium quality · Traditional taste</p>
+        <p>{brandConfig.tagline}</p>
         <div className="socials">
           <a href="#contact" aria-label="Instagram">ig</a>
           <a href="#contact" aria-label="Facebook">f</a>
-          <a href="mailto:info@varshahomemade.com" aria-label="Email">@</a>
+          <a href={`mailto:${brandConfig.contact.emailInfo}`} aria-label="Email">@</a>
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© 2026 Varsha Homemade. All Rights Reserved.</span>
-        <span>Made with love in India</span>
+        <span>© 2026 {brandConfig.name}. All Rights Reserved.</span>
+        <span>{brandConfig.footerNote}</span>
       </div>
     </footer>
   );

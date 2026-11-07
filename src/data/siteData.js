@@ -2,11 +2,9 @@ import besanLadoo from '../../assets/BesanLadoo.jpg';
 import ragiLadoo from '../../assets/RagiLadoo.png';
 import dryFruitLadoo from '../../assets/Dryfruit.png';
 import coconutLadoo from '../../assets/Coconut.jpg';
-import premiumSweets from '../../assets/varsha-sweets-premium.png';
-import logo from '../../assets/header-logo.png';
+import { brandConfig } from '../branding/brandConfig';
 
-export const heroImage = premiumSweets;
-export const logoImage = logo;
+export const heroImage = brandConfig.assets.heroImage;
 
 export const navLinks = [
   { label: 'About', href: '#about' },

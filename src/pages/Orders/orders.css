@@ -7,13 +7,13 @@
 .order-card { background: var(--color-surface); border: 1px solid var(--line); border-radius: var(--radius-panel); padding: 18px 20px; display: grid; gap: 12px; }
 .order-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .order-number { color: var(--maroon); font-size: 17px; overflow-wrap: anywhere; }
-.order-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--cream); color: var(--deep); }
+.order-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: var(--font-weight-semibold); background: var(--cream); color: var(--deep); }
 .order-badge.status-paid { background: var(--color-success-background); color: var(--color-success); }
 .order-badge.status-payment_failed, .order-badge.status-cancelled, .order-badge.status-expired { background: var(--color-error-background); color: var(--color-error); }
 .order-badge.status-pending_payment, .order-badge.status-partially_refunded, .order-badge.status-refunded { background: var(--color-warning-background); color: color-mix(in srgb, var(--color-warning) 65%, var(--color-text)); }
 .order-meta { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 16px; }
 .order-meta dt { color: var(--muted); font-size: 13px; }
-.order-meta dd { margin: 0; font-weight: 600; color: var(--deep); overflow-wrap: anywhere; }
+.order-meta dd { margin: 0; font-weight: var(--font-weight-semibold); color: var(--deep); overflow-wrap: anywhere; }
 .order-card .btn { justify-self: start; }
 .orders-empty, .orders-error { text-align: center; padding: 48px 0; }
 .orders-loading { color: var(--muted); }
@@ -22,7 +22,7 @@
 
 .order-detail { display: grid; gap: 16px; }
 .order-detail h2 { margin: 0 0 12px; font: 600 20px/1.2 var(--serif); color: var(--maroon); }
-.order-back { color: var(--maroon); font-weight: 600; text-decoration: none; }
+.order-back { color: var(--maroon); font-weight: var(--font-weight-semibold); text-decoration: none; }
 .od-items, .od-payments { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
 .od-item { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
 .od-item:first-child { border-top: 0; }

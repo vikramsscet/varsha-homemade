@@ -13,7 +13,8 @@ import CartPage from './pages/Cart/Cart';
 import CheckoutPage from './pages/Checkout/Checkout';
 import AddressesPage from './pages/Checkout/AddressesPage';
 import RequireAuth from './components/RequireAuth';
-import { navLinks, logoImage } from './data/siteData';
+import { navLinks } from './data/siteData';
+import { brandConfig } from './branding/brandConfig';
 
 function ScrollToTop() {
   const location = useLocation();
@@ -70,7 +71,6 @@ function App() {
 
       <Header
         navLinks={navLinks}
-        logo={logoImage}
         menuOpen={menuOpen}
         onToggleMenu={onToggleMenu}
         onCloseMenu={onCloseMenu}
@@ -90,9 +90,9 @@ function App() {
           <Route path="/addresses" element={<AddressesPage />} />
         </Route>
       </Routes>
-      <Footer logo={logoImage} />
+      <Footer />
 
-      <a className="floating-whatsapp whatsapp-link" href="https://wa.me/c/918319510666" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">
+      <a className="floating-whatsapp whatsapp-link" href={brandConfig.social.whatsapp} target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">
         <b>◔</b><span>Chat on WhatsApp</span>
       </a>
       <button

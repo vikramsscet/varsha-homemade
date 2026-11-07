@@ -5,5 +5,5 @@
 .breadcrumbs a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .breadcrumbs a:hover { color: var(--maroon); }
 .breadcrumbs a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
-.breadcrumbs [aria-current='page'] { color: var(--deep); font-weight: 700; overflow-wrap: anywhere; }
+.breadcrumbs [aria-current='page'] { color: var(--deep); font-weight: var(--font-weight-bold); overflow-wrap: anywhere; }
 .breadcrumbs-sep { user-select: none; }

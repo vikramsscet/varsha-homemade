@@ -1,3 +1,7 @@
+import { brandConfig } from '../branding/brandConfig';
+
+const { contact } = brandConfig;
+
 export default function Contact() {
   return (
     <section id="contact" className="contact">
@@ -10,9 +14,9 @@ export default function Contact() {
           </h2>
           <p>Tell us what you’re celebrating and we’ll make it deliciously memorable.</p>
           <div className="contact-details">
-            <a href="tel:+918103862997">✦ &nbsp; +91 8103862997</a>
-            <a href="mailto:sales@varsha-homemade.com">✦ &nbsp; sales@varshahomemade.com</a>
-            <p>✦ &nbsp; Open daily, 9:00 AM – 8:00 PM</p>
+            <a href={`tel:${contact.phone}`}>✦ &nbsp; {contact.phoneDisplay}</a>
+            <a href={`mailto:${contact.emailSales}`}>✦ &nbsp; {contact.emailSales}</a>
+            <p>✦ &nbsp; {contact.hours}</p>
           </div>
         </div>
 
@@ -23,7 +27,7 @@ export default function Contact() {
             Share your occasion, preferred sweets, quantity, and delivery area—we’ll help you create
             the perfect order.
           </p>
-          <a className="button whatsapp-link" href="https://wa.me/c/918319510666" target="_blank" rel="noreferrer">
+          <a className="button whatsapp-link" href={brandConfig.social.whatsapp} target="_blank" rel="noreferrer">
             Contact us on WhatsApp <span>↗</span>
           </a>
           <small>We usually respond during working hours.</small>
@@ -32,7 +36,7 @@ export default function Contact() {
 
       <div className="container reveal" style={{ marginTop: '65px', position: 'relative' }}>
         <iframe
-          title="Varsha Homemade location"
+          title={`${brandConfig.name} location`}
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3781.514119299124!2d73.73916657497752!3d18.59593158251227!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2bbdbe0512d0b%3A0x173f107138f86989!2sHPWR%2BFC9%20Beverly%20Hills%20Society%2C%20Dange%20Chowk%20Rd%2C%20near%20Orritel%20Hotel%2C%20Bhatewara%20Nagar%20Hinjawadi%2C%20Maharashtra%20411057!5e0!3m2!1sen!2sin!4v1785824826029!5m2!1sen!2sin"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"

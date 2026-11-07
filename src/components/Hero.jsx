@@ -1,3 +1,5 @@
+import { brandConfig } from '../branding/brandConfig';
+
 export default function Hero({ heroImage }) {
   return (
     <section className="hero">
@@ -13,7 +15,7 @@ export default function Hero({ heroImage }) {
             gifting, and every little moment worth sharing.
           </p>
           <div className="hero-actions">
-            <a className="button whatsapp-link" href="https://wa.me/c/918319510666" target="_blank" rel="noreferrer">
+            <a className="button whatsapp-link" href={brandConfig.social.whatsapp} target="_blank" rel="noreferrer">
               Chat on WhatsApp <span>↗</span>
             </a>
             <a className="text-link" href="#sweets">

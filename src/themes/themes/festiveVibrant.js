@@ -31,11 +31,13 @@ export default createTheme({
     panelRadius: '24px',
     actionButtonRadius: '999px',
     buttonRadius: '999px',
+    buttonStyle: { letterSpacing: '0.4px' },
     inputRadius: '12px',
     shadows: {
       sm: '0 3px 12px rgba(184, 50, 39, 0.14)',
       md: '0 8px 24px rgba(184, 50, 39, 0.16)',
       lg: '0 16px 36px rgba(184, 50, 39, 0.2)',
+      dropdown: '0 12px 30px rgba(184, 50, 39, 0.22)',
     },
   },
 });

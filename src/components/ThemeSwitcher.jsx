@@ -102,7 +102,10 @@ export default function ThemeSwitcher() {
                     <i key={n} style={{ background: color }} />
                   ))}
                 </span>
-                <span className="theme-option-name">{theme.label}</span>
+                <span className="theme-option-name">
+                  <span className="theme-option-label">{theme.label}</span>
+                  {theme.description && <small className="theme-option-desc">{theme.description}</small>}
+                </span>
                 {selected && (
                   <svg className="theme-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>
                 )}

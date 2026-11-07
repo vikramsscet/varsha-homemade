@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { brandConfig } from '../branding/brandConfig';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,7 +31,7 @@ export default function Products() {
             image: primaryImage?.url,
             badge: 'Classic',
             description: product.subtitle,
-            href: `https://www.varsha-homemade.com/product-page/${product.slug}`,
+            href: `${brandConfig.urls.storefront}/product-page/${product.slug}`,
           };
         }));
       } catch (requestError) {

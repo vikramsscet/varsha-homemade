@@ -37,12 +37,14 @@ export default createTheme({
     panelRadius: '12px',
     actionButtonRadius: '6px',
     buttonRadius: '6px',
+    buttonStyle: { fontWeight: '600', letterSpacing: '0.1px' },
     inputRadius: '6px',
     spacing: '20px',
     shadows: {
       sm: '0 1px 3px rgba(0, 0, 0, 0.06)',
       md: '0 4px 14px rgba(0, 0, 0, 0.06)',
       lg: '0 10px 28px rgba(0, 0, 0, 0.08)',
+      dropdown: '0 8px 24px rgba(0, 0, 0, 0.12)',
     },
   },
 });

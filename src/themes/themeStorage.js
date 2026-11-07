@@ -21,6 +21,15 @@ export function loadThemeId() {
   }
 }
 
+/** True when the customer has an explicit, valid saved choice (not just the default). */
+export function hasStoredThemeId() {
+  try {
+    return isValidThemeId(getStorage()?.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return false;
+  }
+}
+
 export function saveThemeId(id) {
   if (!isValidThemeId(id)) return false;
   try {

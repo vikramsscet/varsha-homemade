@@ -10,6 +10,7 @@ import { clearGuestOrderToken } from '../../services/guestOrderStorage';
 import { tokenStorage } from '../../services/tokenStorage';
 import { initialPaymentState, paymentReducer, restoreState } from '../../context/paymentReducer';
 import { getTheme } from '../../themes/themeConfig';
+import { brandConfig } from '../../branding/brandConfig';
 import { loadThemeId } from '../../themes/themeStorage';
 
 const customerType = () => (tokenStorage.get() ? 'USER' : 'GUEST');
@@ -72,7 +73,7 @@ export function usePayment() {
           order_id: payment.razorpayOrderId,
           amount: payment.amount, // backend-provided, in paise
           currency: payment.currency,
-          name: 'Varsha Homemade',
+          name: brandConfig.name,
           description: `Order ${orderNumber}`,
           prefill,
           theme: { color: getTheme(loadThemeId()).colors.primary.toLowerCase() }, // Classic Indian: #7a1f2b

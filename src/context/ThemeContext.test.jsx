@@ -12,7 +12,7 @@ let store;
 let root;
 const Probe = () => { api = useTheme(); return null; };
 
-function setup(initial = {}) {
+function setup(initial = {}, suggestion) {
   store = { ...initial };
   listeners = {};
   root = { style: { props: {}, setProperty(k, v) { this.props[k] = v; } }, dataset: {} };
@@ -27,7 +27,7 @@ function setup(initial = {}) {
   });
   vi.stubGlobal('document', { documentElement: root });
   let r;
-  act(() => { r = TestRenderer.create(<ThemeProvider><Probe /></ThemeProvider>); });
+  act(() => { r = TestRenderer.create(<ThemeProvider suggestion={suggestion}><Probe /></ThemeProvider>); });
   return r;
 }
 afterEach(() => vi.unstubAllGlobals());
@@ -86,5 +86,31 @@ describe('ThemeProvider', () => {
     act(() => { api.setTheme('modern-minimal'); });
     expect(api.setTheme).toBe(setTheme);
     expect(api.availableThemes).toBe(availableThemes);
+  });
+});
+
+describe('ThemeProvider campaign suggestion', () => {
+  const festive = { themeId: 'festive-vibrant', force: false };
+
+  it('applies the suggested theme for a customer with no saved choice, without persisting it', () => {
+    setup({}, festive);
+    expect(api.currentTheme.id).toBe('festive-vibrant');
+    expect(THEME_STORAGE_KEY in store).toBe(false);
+  });
+
+  it("does not override a customer's saved theme", () => {
+    setup({ [THEME_STORAGE_KEY]: 'modern-minimal' }, festive);
+    expect(api.currentTheme.id).toBe('modern-minimal');
+  });
+
+  it('overrides a saved theme only when force is set, still without persisting', () => {
+    setup({ [THEME_STORAGE_KEY]: 'modern-minimal' }, { ...festive, force: true });
+    expect(api.currentTheme.id).toBe('festive-vibrant');
+    expect(store[THEME_STORAGE_KEY]).toBe('modern-minimal');
+  });
+
+  it('ignores an unknown suggested id', () => {
+    setup({}, { themeId: 'nope', force: true });
+    expect(api.currentTheme.id).toBe('classic-indian');
   });
 });

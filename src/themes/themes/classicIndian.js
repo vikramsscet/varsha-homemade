@@ -38,6 +38,7 @@ export default createTheme({
       sm: '0 5px 18px rgba(61, 43, 31, 0.094)',
       md: '0 8px 28px rgba(61, 43, 31, 0.043)',
       lg: '0 14px 30px rgba(61, 43, 31, 0.125)',
+      dropdown: '0 10px 28px rgba(61, 43, 31, 0.18)',
     },
   },
 });

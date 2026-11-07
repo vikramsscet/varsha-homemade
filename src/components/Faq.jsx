@@ -1,3 +1,5 @@
+import { brandConfig } from '../branding/brandConfig';
+
 export default function Faq({ faqItems }) {
   return (
     <section className="section faq">
@@ -8,7 +10,7 @@ export default function Faq({ faqItems }) {
             Good things take <i>care.</i>
           </h2>
           <p>Have something specific in mind? We’re always happy to help you choose the perfect box.</p>
-          <a className="text-link whatsapp-link" href="https://wa.me/c/918319510666" target="_blank" rel="noreferrer">
+          <a className="text-link whatsapp-link" href={brandConfig.social.whatsapp} target="_blank" rel="noreferrer">
             Ask us on WhatsApp <span>↗</span>
           </a>
         </div>

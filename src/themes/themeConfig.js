@@ -53,6 +53,7 @@ export function themeToCssVars(themeOrId) {
   vars['--radius-button'] = design.buttonRadius;
   vars['--radius-input'] = design.inputRadius;
   vars['--spacing-default'] = design.spacing;
+  for (const [k, v] of Object.entries(design.buttonStyle)) vars[`--button-${kebab(k)}`] = String(v);
   for (const [k, v] of Object.entries(design.shadows)) vars[`--shadow-${k}`] = v;
   vars['--shadow-card'] = design.shadows.md;
   return vars;

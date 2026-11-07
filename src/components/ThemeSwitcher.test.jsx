@@ -39,7 +39,11 @@ describe('ThemeSwitcher', () => {
     const r = render();
     act(() => trigger(r).props.onClick());
     const items = options(r);
-    expect(items.map(text)).toEqual(['Classic Indian', 'Modern Minimal', 'Festive & Vibrant']);
+    expect(items.map(text)).toEqual([
+      'Classic IndianWarm maroon and gold on cream.',
+      'Modern MinimalClean terracotta and sage on soft white.',
+      'Festive & VibrantBold red and marigold for celebrations.',
+    ]);
     expect(items.map((i) => i.props['aria-checked'])).toEqual([true, false, false]);
     expect(trigger(r).props['aria-expanded']).toBe(true);
   });

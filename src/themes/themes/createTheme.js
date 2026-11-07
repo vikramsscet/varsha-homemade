@@ -4,13 +4,15 @@ const BASE = {
   typography: {
     headingFont: "'Playfair Display', serif",
     bodyFont: "'DM Sans', sans-serif",
-    fontWeights: { regular: 400, medium: 500, semibold: 600, bold: 700 },
+    fontWeights: { normal: 400, medium: 500, semibold: 600, bold: 700 },
   },
   design: {
     cardRadius: '16px',
     buttonRadius: '999px',
     inputRadius: '8px',
     spacing: '16px',
+    // Button styling tokens (shape comes from buttonRadius; colours from the palette).
+    buttonStyle: { fontWeight: '700', textTransform: 'none', letterSpacing: '0.2px', borderWidth: '1px', hoverLift: '-2px' },
   },
 };
 

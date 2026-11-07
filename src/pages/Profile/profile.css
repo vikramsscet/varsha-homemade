@@ -8,7 +8,7 @@
 .profile-identity h1 { margin: 0 0 4px; font: 600 30px/1.2 var(--serif); color: var(--maroon); overflow-wrap: anywhere; }
 .profile-identity p { margin: 0 0 12px; color: var(--muted); overflow-wrap: anywhere; }
 .profile-badges { display: flex; flex-wrap: wrap; gap: 8px; }
-.profile-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.profile-badge { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: var(--font-weight-semibold); }
 .profile-badge.is-good { background: var(--color-success-background); color: var(--color-success); }
 .profile-badge.is-warn { background: var(--color-error-background); color: var(--maroon); }
 .profile-list { margin: 0; }

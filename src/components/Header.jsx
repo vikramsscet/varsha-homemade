@@ -3,8 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import AccountMenu from './AccountMenu';
 import CartLink from './CartLink';
 import ThemeSwitcher from './ThemeSwitcher';
+import { brandConfig } from '../branding/brandConfig';
 
-export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onCloseMenu }) {
+export default function Header({ navLinks, menuOpen, onToggleMenu, onCloseMenu }) {
   const location = useLocation();
   const { status } = useAuth();
 
@@ -17,8 +18,8 @@ export default function Header({ navLinks, logo, menuOpen, onToggleMenu, onClose
   return (
     <header className="site-header" id="home">
       <nav className="nav container" aria-label="Main navigation">
-        <Link className="brand header-brand" to="/" aria-label="Varsha Homemade home" onClick={handleBrandClick}>
-          <img src={logo} alt="Varsha's Homemade logo" />
+        <Link className="brand header-brand" to="/" aria-label={`${brandConfig.name} home`} onClick={handleBrandClick}>
+          <img src={brandConfig.assets.primaryLogo} alt={brandConfig.assets.logoAlt} />
         </Link>
 
         <div className={`nav-links ${menuOpen ? 'open' : ''}`}>

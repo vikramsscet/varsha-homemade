@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Hero from '../../components/Hero';
+import CampaignBanner from '../../components/CampaignBanner';
 import TrustBar from '../../components/TrustBar';
 import About from '../../components/About';
 import Products from '../../components/Products';
@@ -62,6 +63,7 @@ export default function HomePage() {
   return (
     <>
       <Hero heroImage={heroImage} />
+      <CampaignBanner />
       <TrustBar items={trustItems} />
       <About />
       <Products />
