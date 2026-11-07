@@ -95,4 +95,31 @@ describe('paymentApi credentials', () => {
     expect(call().url).toBe('http://api.test/api/v1/payments/verify');
     expect(JSON.parse(call().body)).toEqual({ internalPaymentId: 'p1', razorpay_order_id: 'order_1', razorpay_payment_id: 'pay_1', razorpay_signature: 'sig' });
   });
+
+  it('never mixes JWT with guest credentials, and never sends the anon cart id', async () => {
+    tokenStorage.set('jwt');
+    saveGuestSession({ sessionToken: 'S'.repeat(43) });
+    saveGuestOrderToken({ orderId: 'o1', token: ORDER_TOKEN });
+    setAnonymousCartId('a'.repeat(36));
+    f.mockResolvedValue(ok({}));
+    await createRazorpayOrder('o1');
+    const h = call().headers;
+    expect(h.Authorization).toBe('Bearer jwt');
+    expect(Object.keys(h).filter((k) => /guest|anonymous/i.test(k))).toEqual([]);
+  });
+
+  it('guest tokens never reach localStorage', async () => {
+    saveGuestSession({ sessionToken: 'S'.repeat(43) });
+    f.mockResolvedValue(ok({ id: 'o1', guestAccessToken: ORDER_TOKEN }));
+    await createOrder({});
+    expect(JSON.stringify(local.d)).not.toContain(ORDER_TOKEN);
+    expect(JSON.stringify(local.d)).not.toContain('S'.repeat(43));
+  });
+
+  it('never calls the webhook endpoint', async () => {
+    saveGuestSession({ sessionToken: 'S'.repeat(43) });
+    f.mockResolvedValue(ok({}));
+    await createOrder({}); await createRazorpayOrder('o1');
+    expect(f.mock.calls.every(([u]) => !u.includes('webhook'))).toBe(true);
+  });
 });

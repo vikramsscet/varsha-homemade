@@ -5,6 +5,7 @@ import CountrySelect from '../../components/Field/CountrySelect';
 import { useGuestCheckout } from '../../context/GuestCheckoutContext';
 import { DEAD_SESSION_CODES } from '../../services/guestCheckoutApi';
 import PaymentSection from './PaymentSection';
+import { getGuestOrderToken } from '../../services/guestOrderStorage';
 import { getGuestSession } from '../../services/guestCheckoutStorage';
 import { getFieldErrors } from '../../services/apiErrors';
 import { getGuestCheckoutErrorMessage, SESSION_EXPIRED_MESSAGE } from '../../services/checkoutErrors';
@@ -129,10 +130,12 @@ export default function GuestCheckout({ onPayNow, payment }) {
 
   // Ready only when the *saved* session holds valid details (what the backend will see).
   const sc = guest.session?.customer, sd = guest.session?.deliveryAddress;
-  const ready = !!guest.session && !guest.expired
+  // An existing guest order with its order token can continue even after the session expired.
+  const recoverable = !!(payment?.orderId && getGuestOrderToken(payment.orderId));
+  const ready = recoverable || (!!guest.session && !guest.expired
     && Object.keys(validateCustomer(sc ?? {})).length === 0
-    && Object.keys(validateDelivery({ ...(sd ?? {}), country: sd?.countryName ?? sd?.country })).length === 0;
-  const expired = guest.expired || expiredNotice;
+    && Object.keys(validateDelivery({ ...(sd ?? {}), country: sd?.countryName ?? sd?.country })).length === 0);
+  const expired = (guest.expired || expiredNotice) && !recoverable;
   return (
     <form className="checkout-form" onSubmit={handleSubmit} noValidate aria-busy={saving || initializing}>
       <p className="checkout-signin">Have an account? <Link to="/login" state={{ from: '/checkout' }}>Sign in</Link></p>

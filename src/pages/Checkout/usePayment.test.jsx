@@ -5,6 +5,9 @@ import { usePayment } from './usePayment';
 import * as api from '../../services/paymentApi';
 import { loadRazorpay } from '../../services/razorpayLoader';
 import { ApiError } from '../../services/apiClient';
+import { getPaymentRef, savePaymentRef } from '../../services/paymentRefStorage';
+import { saveGuestOrderToken, getGuestOrderToken, clearGuestOrderToken } from '../../services/guestOrderStorage';
+import { tokenStorage } from '../../services/tokenStorage';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 vi.mock('../../services/paymentApi');
@@ -26,8 +29,14 @@ async function mount() {
 const start = (arg = { addressId: 'ad1' }) => { let p; act(() => { p = hook.pay(arg); }); return p; };
 const flush = () => act(async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); });
 
+const mem = () => { const d = {}; return { d, getItem: (k) => d[k] ?? null, setItem: (k, v) => { d[k] = v; }, removeItem: (k) => { delete d[k]; } }; };
+let sess;
 beforeEach(() => {
   vi.clearAllMocks();
+  sess = mem();
+  vi.stubGlobal('window', { sessionStorage: sess, localStorage: mem() });
+  tokenStorage.clear();
+  clearGuestOrderToken();
   refreshCart.mockResolvedValue({});
   api.createOrder.mockResolvedValue(order);
   api.createRazorpayOrder.mockResolvedValue(pmt);
@@ -132,5 +141,96 @@ describe('usePayment', () => {
     const keys = api.createOrder.mock.calls.map((c) => c[0].idempotencyKey);
     expect(keys[0]).toBe(keys[1]);
     expect(keys[2]).not.toBe(keys[1]);
+  });
+
+  it('retry after failure opens Checkout for the NEW attempt on the same order', async () => {
+    api.verifyPayment.mockRejectedValueOnce(new ApiError({ status: 402, code: 'PAYMENT_FAILED' }));
+    await mount();
+    start(); await flush(); await flush();
+    await act(async () => { await opts.handler({ razorpay_order_id: 'order_1', razorpay_payment_id: 'p', razorpay_signature: 's' }); });
+    api.createRazorpayOrder.mockResolvedValue({ ...pmt, paymentId: 'p2', razorpayOrderId: 'order_2', attemptNumber: 2 });
+    await act(async () => { hook.retry(); }); await flush(); await flush();
+    expect(opts.order_id).toBe('order_2');
+    expect(hook.payment.paymentId).toBe('p2');
+    expect(hook.payment.attemptNumber).toBe(2);
+    expect(api.createOrder).toHaveBeenCalledTimes(1);
+    api.verifyPayment.mockResolvedValue({ paid: true });
+    await act(async () => { await opts.handler({ razorpay_order_id: 'order_2', razorpay_payment_id: 'p', razorpay_signature: 's' }); });
+    expect(api.verifyPayment).toHaveBeenLastCalledWith(expect.objectContaining({ internalPaymentId: 'p2' }));
+    expect(hook.payment.status).toBe('PAYMENT_SUCCESS');
+  });
+
+  it('a reused open attempt (reused: true) opens Checkout normally', async () => {
+    api.createRazorpayOrder.mockResolvedValue({ ...pmt, reused: true });
+    await mount();
+    start(); await flush(); await flush();
+    expect(opts.order_id).toBe('order_1');
+  });
+
+  it('refresh after popup dismissal restores the order and continues without a new order', async () => {
+    await mount();
+    start(); await flush(); await flush();
+    expect(getPaymentRef()).toMatchObject({ orderId: 'o1', orderNumber: 'VH1', customerType: 'GUEST' });
+    await mount(); // simulated reload: a fresh hook reads storage only
+    expect(hook.payment).toMatchObject({ status: 'IDLE', orderId: 'o1', restored: true });
+    start({}); await flush(); await flush();
+    expect(api.createOrder).toHaveBeenCalledTimes(1);
+    expect(api.createRazorpayOrder).toHaveBeenLastCalledWith('o1');
+  });
+
+  it('a payment already submitted restores as confirming and cannot start another attempt', async () => {
+    savePaymentRef({ orderId: 'o1', orderNumber: 'VH1', customerType: 'GUEST', status: 'CONFIRMING' });
+    await mount();
+    expect(hook.payment.status).toBe('PAYMENT_CONFIRMING');
+    start({}); await flush();
+    expect(api.createRazorpayOrder).not.toHaveBeenCalled();
+    expect(api.verifyPayment).not.toHaveBeenCalled(); // never re-verifies without callback data
+  });
+
+  it('does not restore an order of the other customer type', async () => {
+    savePaymentRef({ orderId: 'o1', customerType: 'USER' });
+    await mount();
+    expect(hook.payment.orderId).toBeNull();
+  });
+
+  it('keeps the idempotency key across a reload after an uncertain network failure', async () => {
+    api.createOrder.mockRejectedValueOnce(new ApiError({}));
+    await mount();
+    start(); await flush(); await flush();
+    const first = api.createOrder.mock.calls[0][0].idempotencyKey;
+    await mount();
+    start(); await flush(); await flush();
+    expect(api.createOrder.mock.calls[1][0].idempotencyKey).toBe(first);
+  });
+
+  it('success clears recovery data and the guest order token; failure keeps them', async () => {
+    saveGuestOrderToken({ orderId: 'o1', token: 'T'.repeat(43) });
+    await verifyWith(() => api.verifyPayment.mockRejectedValue(new ApiError({ status: 402, code: 'PAYMENT_FAILED' })));
+    expect(getPaymentRef()).toMatchObject({ orderId: 'o1' });
+    expect(getGuestOrderToken('o1')).toBeTruthy();
+    api.verifyPayment.mockResolvedValue({ paid: true });
+    await act(async () => { hook.retry(); }); await flush(); await flush();
+    await act(async () => { await opts.handler({ razorpay_order_id: 'o', razorpay_payment_id: 'p', razorpay_signature: 's' }); });
+    expect(getPaymentRef()).toBeNull();
+    expect(getGuestOrderToken('o1')).toBeNull();
+  });
+
+  it('an expired order is forgotten so the next attempt creates a fresh one', async () => {
+    api.createRazorpayOrder.mockRejectedValueOnce(new ApiError({ status: 409, code: 'ORDER_EXPIRED' }));
+    await mount();
+    start(); await flush(); await flush();
+    expect(hook.payment.orderId).toBeNull();
+    expect(getPaymentRef()?.orderId).toBeUndefined();
+    start(); await flush(); await flush();
+    expect(api.createOrder).toHaveBeenCalledTimes(2);
+  });
+
+  it('never writes tokens or secrets to storage', async () => {
+    await mount();
+    start(); await flush(); await flush();
+    await act(async () => { await opts.handler({ razorpay_order_id: 'o', razorpay_payment_id: 'p', razorpay_signature: 'SIGSECRET' }); });
+    const dump = JSON.stringify(sess.d) + JSON.stringify(window.localStorage.d);
+    expect(dump).not.toContain('SIGSECRET');
+    expect(dump).not.toMatch(/secret/i);
   });
 });

@@ -38,10 +38,14 @@ export default function PaymentSection({ ready, busy = false, onPayNow, payment 
         <p className="payment-secure">🔒 Payments are processed securely by Razorpay. We never store your card details.</p>
       </div>
       {!ready && <p className="field-hint" id="pay-hint">Complete your customer details and delivery address to continue.</p>}
+      {payment?.restored && status === S.IDLE && payment.orderNumber && (
+        <p role="status" className="field-hint">We found your unfinished order {payment.orderNumber}. Continue to complete the payment; you won't be charged twice.</p>
+      )}
       {status === S.VERIFYING_PAYMENT && <p role="status" className="checkout-loading">Verifying your payment…</p>}
       {(status === S.PAYMENT_CONFIRMING || status === S.PAYMENT_FAILED) && (
         <div role={status === S.PAYMENT_FAILED ? 'alert' : 'status'} className={`payment-status ${status === S.PAYMENT_FAILED ? 'is-failed' : 'is-pending'}`}>
           <p>{getVerifyMessage(payment.outcome?.kind ?? 'unverified')}</p>
+          {status === S.PAYMENT_CONFIRMING && <p>If this takes long, contact support with your order number; we will update your order once the payment is confirmed.</p>}
           {payment.orderNumber && <p>Order {payment.orderNumber}{payment.amount != null ? ` · ${formatCurrency(payment.amount / 100, payment.currency)}` : ''}</p>}
         </div>
       )}

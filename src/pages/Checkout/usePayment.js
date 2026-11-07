@@ -4,8 +4,14 @@ import { loadRazorpay } from '../../services/razorpayLoader';
 import { toErrorInfo } from '../../services/apiErrors';
 import { useCart } from '../../context/CartContext';
 import { PAYMENT_STATUS as S, RECHECK_CODES, classifySuccessBody, classifyVerifyError } from '../../services/paymentResult';
-import { savePaymentRef } from '../../services/paymentRefStorage';
-import { initialPaymentState, paymentReducer } from '../../context/paymentReducer';
+import { clearPaymentRef, getPaymentRef, updatePaymentRef } from '../../services/paymentRefStorage';
+import { clearGuestOrderToken } from '../../services/guestOrderStorage';
+import { tokenStorage } from '../../services/tokenStorage';
+import { initialPaymentState, paymentReducer, restoreState } from '../../context/paymentReducer';
+
+const customerType = () => (tokenStorage.get() ? 'USER' : 'GUEST');
+// Order-creation failures after which the order can never be paid: stop recovering it.
+const UNRECOVERABLE = ['ORDER_EXPIRED', 'ORDER_ALREADY_PAID', 'ORDER_NOT_PAYABLE', 'ORDER_NOT_FOUND'];
 
 const newKey = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 
@@ -13,11 +19,11 @@ const newKey = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math
 // after /payments/verify succeeds. A dismissed modal keeps the order/payment for a later retry.
 export function usePayment() {
   const { items, subtotal, discountAmount, taxAmount, totalAmount, currency, cart, refreshCart } = useCart();
-  const [state, dispatch] = useReducer(paymentReducer, initialPaymentState);
+  const [state, dispatch] = useReducer(paymentReducer, initialPaymentState, () => restoreState(getPaymentRef(), customerType()));
   const ref = useRef(state);
   ref.current = state;
   const busy = useRef(false);
-  const idemKey = useRef(null); // one key per logical order creation; reused across network retries
+  const idemKey = useRef(getPaymentRef()?.pendingKey ?? null); // one key per logical order creation; reused across network retries
 
   const snapshot = () => ({ items, subtotal, discountAmount, taxAmount, totalAmount, currency, shippingAmount: cart?.shippingAmount });
   const lastArgs = useRef(null);
@@ -35,16 +41,18 @@ export function usePayment() {
       if (!orderId || (addressId && orderAddress !== addressId)) {
         dispatch({ type: 'STATUS', status: S.CREATING_ORDER, snapshot: ref.current.snapshot ?? snapshot() });
         idemKey.current = idemKey.current ?? newKey();
+        updatePaymentRef({ pendingKey: idemKey.current, customerType: customerType() }); // survives a refresh mid-request
         const order = await createOrder({ addressId, idempotencyKey: idemKey.current });
         dispatch({ type: 'ORDER_CREATED', order, addressId });
-        savePaymentRef({ orderId: order.id, orderNumber: order.orderNumber });
+        updatePaymentRef({ orderId: order.id, orderNumber: order.orderNumber, customerType: customerType(), addressId: addressId ?? null, pendingKey: null });
         idemKey.current = null;
         orderId = order.id;
         orderNumber = order.orderNumber;
       }
       dispatch({ type: 'STATUS', status: S.CREATING_PAYMENT });
       const payment = await createRazorpayOrder(orderId);
-      dispatch({ type: 'PAYMENT_CREATED', payment });
+      dispatch({ type: 'PAYMENT_CREATED', payment }); // payment.reused === true is an open attempt: same flow
+      updatePaymentRef({ paymentId: payment.paymentId, amount: payment.amount, currency: payment.currency, status: 'IN_PROGRESS' });
 
       let Razorpay;
       try {
@@ -77,7 +85,12 @@ export function usePayment() {
               const status = classifySuccessBody(result);
               dispatch({ type: 'VERIFIED', status, result, at: new Date().toISOString() });
               // Cart is refreshed only after backend-confirmed payment.
-              if (status === S.PAYMENT_SUCCESS) cartActions.current.refreshCart?.().catch(() => {});
+              if (status === S.PAYMENT_SUCCESS) {
+                // Lifecycle complete: recovery data is no longer needed.
+                clearPaymentRef();
+                clearGuestOrderToken();
+                cartActions.current.refreshCart?.().catch(() => {});
+              } else updatePaymentRef({ status: 'CONFIRMING' });
             };
             try {
               await apply(await verifyPayment(body));
@@ -86,6 +99,10 @@ export function usePayment() {
               // Already processed / already paid: ask again for the existing status (once).
               if (RECHECK_CODES.includes(e?.code)) {
                 try { await apply(await verifyPayment(body)); err = null; } catch (e2) { err = e2; }
+              }
+              if (err) {
+                const outcome = classifyVerifyError(err);
+                updatePaymentRef({ status: outcome.status === S.PAYMENT_CONFIRMING ? 'CONFIRMING' : 'FAILED' });
               }
               if (err) dispatch({ type: 'VERIFY_ISSUE', ...(({ status, ...outcome }) => ({ status, outcome }))(classifyVerifyError(err)), error: toErrorInfo(err) });
             }
@@ -104,7 +121,15 @@ export function usePayment() {
         rzp.open();
       });
     } catch (e) {
-      if (e?.code !== 'NETWORK_ERROR') idemKey.current = null; // only a network retry reuses the key
+      if (e?.code !== 'NETWORK_ERROR') {
+        idemKey.current = null; // only a network retry reuses the key
+        updatePaymentRef({ pendingKey: null });
+      }
+      if (UNRECOVERABLE.includes(e?.code)) {
+        clearPaymentRef();
+        clearGuestOrderToken();
+        dispatch({ type: 'FORGET_ORDER' });
+      }
       fail(e);
     } finally {
       busy.current = false;

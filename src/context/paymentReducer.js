@@ -20,7 +20,23 @@ export const initialPaymentState = {
   outcome: null, // { kind, retryable } for FAILED / CONFIRMING issues
   snapshot: null, // order summary captured when payment started (cart is refreshed after success)
   error: null, // request-level error before checkout opened
+  restored: false, // true when the order was recovered from storage after a refresh
 };
+
+// Rebuilds state from the persisted recovery reference (no secrets in it). A payment that was
+// already submitted stays in the safe confirming state; anything else is simply an unpaid order
+// that can continue: a missing callback is never treated as a failure.
+export function restoreState(ref, customerType) {
+  if (!ref?.orderId || ref.customerType !== customerType) return initialPaymentState;
+  return {
+    ...initialPaymentState,
+    status: ref.status === 'CONFIRMING' ? S.PAYMENT_CONFIRMING : S.IDLE,
+    outcome: ref.status === 'CONFIRMING' ? { kind: 'unverified', retryable: false } : null,
+    orderId: ref.orderId, orderNumber: ref.orderNumber ?? null, addressId: ref.addressId ?? null,
+    paymentId: ref.paymentId ?? null, amount: ref.amount ?? null, currency: ref.currency ?? null,
+    restored: true,
+  };
+}
 
 export function paymentReducer(state, action) {
   switch (action.type) {
@@ -47,6 +63,10 @@ export function paymentReducer(state, action) {
       return { ...state, status: action.status, outcome: action.outcome, error: action.error };
     case 'ERROR': // order / payment creation failed, nothing was charged
       return { ...state, status: S.IDLE, error: action.error };
+    case 'FORGET_ORDER':
+      return { ...state, orderId: null, orderNumber: null, addressId: null, paymentId: null, restored: false };
+    case 'RESTORED_DONE':
+      return { ...state, restored: false };
     case 'RESET':
       return initialPaymentState;
     default:
